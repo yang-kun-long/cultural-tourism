@@ -1,0 +1,44 @@
+// File: routes/router.go
+package routes
+
+import (
+	"cultural-tourism-backend/controllers"
+
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+)
+
+func RegisterRoutes(r *gin.Engine) {
+	api := r.Group("/api")
+	{
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		// ==============================
+		// Regions 区域管理 (标准 REST API)
+		// ==============================
+
+		// 1. 创建 (Create)
+		api.POST("/regions", controllers.CreateRegion)
+
+		// 2. 列表查询 (Read List)
+		api.GET("/regions", controllers.GetRegions)
+
+		// 3. 单条详情 (Read Detail) - 新增
+		api.GET("/regions/:id", controllers.GetRegionDetail)
+
+		// 4. 更新 (Update) - 新增
+		// 使用 PUT 用于全量/部分更新
+		api.PUT("/regions/:id", controllers.UpdateRegion)
+
+		// 5. 删除 (Delete)
+		api.DELETE("/regions/:id", controllers.DeleteRegion)
+
+		// === Phase 3: POI (点位管理) ===
+		// === Phase 3: POI (点位管理) ===
+		api.POST("/pois", controllers.CreatePOI)       // 创建
+		api.GET("/pois", controllers.GetPOIList)       // 列表 (支持 region_id, type 筛选)
+		api.GET("/pois/:id", controllers.GetPOI)       // 详情
+		api.PUT("/pois/:id", controllers.UpdatePOI)    // 更新
+		api.DELETE("/pois/:id", controllers.DeletePOI) // 删除
+	}
+}

@@ -1,0 +1,178 @@
+{
+  "previewTableName": "",
+  "publishCacheStatus": "ready",
+  "subType": "database",
+  "schema": {
+    "x-primary-column": "_id",
+    "x-kind": "tcb",
+    "x-defaultMethods": [
+      "wedaCreate",
+      "wedaUpdate",
+      "wedaDelete",
+      "wedaGetItem",
+      "wedaGetRecords",
+      "wedaGetList",
+      "wedaBatchCreate",
+      "wedaBatchUpdate",
+      "wedaBatchDelete"
+    ],
+    "type": "object",
+    "x-relatedType": "exist",
+    "x-viewId": "view-regions-001",
+    "required": ["name"],
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "区域名称",
+        "description": "例如：主景区、西湖区",
+        "x-index": 0,
+        "x-unique": false,
+        "x-sort": true,
+        "x-filter": true
+      },
+      "sort": {
+        "type": "number",
+        "title": "排序权重",
+        "default": 0,
+        "description": "数字越小越靠前",
+        "x-index": 1,
+        "x-sort": true
+      },
+      "status": {
+        "type": "number",
+        "title": "状态",
+        "default": 1,
+        "description": "1:启用, 0:禁用",
+        "x-index": 2,
+        "x-filter": true
+      },
+      "owner": {
+        "default": "",
+        "x-system": true,
+        "x-id": "5176a06",
+        "name": "owner",
+        "format": "father-son",
+        "pattern": "",
+        "x-hidden": true,
+        "type": "string",
+        "title": "所有人",
+        "x-index": 3,
+        "x-unique": false,
+        "x-parent": {
+          "fatherAction": "judge",
+          "type": "father-son",
+          "parentDataSourceName": "sys_user"
+        }
+      },
+      "_mainDep": {
+        "x-system": true,
+        "x-id": "8a46fca",
+        "name": "_mainDep",
+        "format": "father-son",
+        "x-hidden": true,
+        "type": "string",
+        "title": "所属主管部门",
+        "x-index": 4,
+        "x-unique": false,
+        "x-parent": {
+          "fatherAction": "judge",
+          "type": "father-son",
+          "parentDataSourceName": "sys_department"
+        }
+      },
+      "createdAt": {
+        "default": 0,
+        "x-system": true,
+        "x-id": "4332875",
+        "format": "datetime",
+        "type": "number",
+        "title": "创建时间",
+        "x-index": 5,
+        "x-unique": false
+      },
+      "createBy": {
+        "default": "",
+        "x-system": true,
+        "x-id": "d0de152",
+        "name": "createBy",
+        "format": "father-son",
+        "pattern": "",
+        "x-hidden": true,
+        "type": "string",
+        "title": "创建人",
+        "x-index": 6,
+        "x-unique": false,
+        "x-parent": {
+          "fatherAction": "judge",
+          "type": "father-son",
+          "parentDataSourceName": "sys_user"
+        }
+      },
+      "updateBy": {
+        "default": "",
+        "x-system": true,
+        "x-id": "93a079a",
+        "name": "updateBy",
+        "format": "father-son",
+        "pattern": "",
+        "x-hidden": true,
+        "type": "string",
+        "title": "修改人",
+        "x-index": 7,
+        "x-unique": false,
+        "x-parent": {
+          "fatherAction": "judge",
+          "type": "father-son",
+          "parentDataSourceName": "sys_user"
+        }
+      },
+      "_openid": {
+        "default": "",
+        "x-system": true,
+        "x-id": "a9aa7e2",
+        "name": "_openid",
+        "format": "",
+        "pattern": "",
+        "description": "仅微信云开发下使用",
+        "type": "string",
+        "title": "记录创建者",
+        "x-index": 8,
+        "x-unique": false
+      },
+      "_id": {
+        "x-system": true,
+        "x-id": "431aaf6",
+        "format": "",
+        "type": "string",
+        "title": "数据标识",
+        "x-index": 9,
+        "x-unique": true
+      },
+      "updatedAt": {
+        "default": 0,
+        "x-system": true,
+        "x-id": "26ce76b",
+        "format": "datetime",
+        "type": "number",
+        "title": "更新时间",
+        "x-index": 10,
+        "x-unique": false
+      }
+    }
+  },
+  "dbInstanceType": "FLEXDB",
+  "title": "区域管理",
+  "prodDbInfo": null,
+  "stagingSwitch": false,
+  "name": "regions",
+  "dataHubName": "flexdb",
+  "dbLinkType": "internal",
+  "tableNameRule": "only_name",
+  "type": "database",
+  "updateTime": "2026-01-29T00:00:00",
+  "publishedTableName": "regions",
+  "dbSourceType": "internal_flexdb",
+  "methods": [],
+  "publishStatus": 1,
+  "configuration": {}
+}

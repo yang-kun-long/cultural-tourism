@@ -1,0 +1,269 @@
+{
+  "previewTableName": "",
+  "publishCacheStatus": "notready",
+  "subType": "database",
+  "schema": {
+    "x-primary-column": "_id",
+    "x-kind": "tcb",
+    "x-defaultMethods": [
+      "wedaCreate",
+      "wedaUpdate",
+      "wedaDelete",
+      "wedaGetItem",
+      "wedaGetRecords",
+      "wedaGetList",
+      "wedaBatchCreate",
+      "wedaBatchUpdate",
+      "wedaBatchDelete"
+    ],
+    "type": "object",
+    "x-relatedType": "exist",
+    "x-viewId": "view-7qlsrxu7i8",
+    "required": [
+      "name",
+      "region_id",
+      "type"
+    ],
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "点位名称",
+        "description": "例如：雷峰塔、断桥残雪",
+        "x-index": 0,
+        "x-filter": true,
+        "x-sort": true
+      },
+      "type": {
+        "type": "string",
+        "title": "类型",
+        "description": "scenic(景点), food(餐饮), hotel(酒店), booth(旅拍机)",
+        "enum": [
+          "scenic",
+          "food",
+          "hotel",
+          "booth"
+        ],
+        "x-enumObj": [
+          {
+            "label": "景点",
+            "value": "scenic"
+          },
+          {
+            "label": "餐饮",
+            "value": "food"
+          },
+          {
+            "label": "酒店",
+            "value": "hotel"
+          },
+          {
+            "label": "旅拍机",
+            "value": "booth"
+          }
+        ],
+        "x-index": 1,
+        "x-filter": true
+      },
+      "region_id": {
+        "type": "string",
+        "title": "所属区域ID",
+        "description": "关联 regions 表的 _id",
+        "x-index": 2,
+        "x-filter": true
+      },
+      "latitude": {
+        "type": "number",
+        "title": "纬度",
+        "description": "例如 30.25",
+        "x-index": 3
+      },
+      "longitude": {
+        "type": "number",
+        "title": "经度",
+        "description": "例如 120.15",
+        "x-index": 4
+      },
+      "images": {
+        "type": "array",
+        "title": "图片列表",
+        "items": {
+          "type": "string"
+        },
+        "description": "存放云存储图片URL",
+        "x-index": 5
+      },
+      "desc": {
+        "type": "string",
+        "title": "简介",
+        "description": "点位详细介绍",
+        "x-index": 6
+      },
+      "address": {
+        "type": "string",
+        "title": "详细地址",
+        "x-index": 7
+      },
+      "phone": {
+        "type": "string",
+        "title": "联系电话",
+        "x-index": 8
+      },
+      "open_time": {
+        "type": "string",
+        "title": "营业时间",
+        "description": "例如：09:00-18:00",
+        "x-index": 9
+      },
+      "status": {
+        "type": "number",
+        "title": "状态",
+        "description": "1:启用, 0:禁用",
+        "default": 1,
+        "x-index": 10,
+        "x-filter": true
+      },
+      "created_at": {
+        "type": "string",
+        "title": "创建时间(业务)",
+        "format": "date-time",
+        "x-index": 11
+      },
+      "updated_at": {
+        "type": "string",
+        "title": "更新时间(业务)",
+        "format": "date-time",
+        "x-index": 12
+      },
+      "owner": {
+        "default": "",
+        "x-system": true,
+        "x-id": "23dfa5e",
+        "name": "owner",
+        "format": "father-son",
+        "pattern": "",
+        "x-hidden": true,
+        "type": "string",
+        "title": "所有人",
+        "x-index": 13,
+        "x-unique": false,
+        "x-parent": {
+          "fatherAction": "judge",
+          "type": "father-son",
+          "parentDataSourceName": "sys_user"
+        }
+      },
+      "_mainDep": {
+        "x-system": true,
+        "x-id": "fb20ebe",
+        "name": "_mainDep",
+        "format": "father-son",
+        "x-hidden": true,
+        "type": "string",
+        "title": "所属主管部门",
+        "x-index": 14,
+        "x-unique": false,
+        "x-parent": {
+          "fatherAction": "judge",
+          "type": "father-son",
+          "parentDataSourceName": "sys_department"
+        }
+      },
+      "createdAt": {
+        "default": 0,
+        "x-system": true,
+        "x-id": "9564689",
+        "format": "datetime",
+        "type": "number",
+        "title": "创建时间(系统)",
+        "x-index": 15,
+        "x-unique": false
+      },
+      "createBy": {
+        "default": "",
+        "x-system": true,
+        "x-id": "5f38bf1",
+        "name": "createBy",
+        "format": "father-son",
+        "pattern": "",
+        "x-hidden": true,
+        "type": "string",
+        "title": "创建人",
+        "x-index": 16,
+        "x-unique": false,
+        "x-parent": {
+          "fatherAction": "judge",
+          "type": "father-son",
+          "parentDataSourceName": "sys_user"
+        }
+      },
+      "updateBy": {
+        "default": "",
+        "x-system": true,
+        "x-id": "93a079a",
+        "name": "updateBy",
+        "format": "father-son",
+        "pattern": "",
+        "x-hidden": true,
+        "type": "string",
+        "title": "修改人",
+        "x-index": 17,
+        "x-unique": false,
+        "x-parent": {
+          "fatherAction": "judge",
+          "type": "father-son",
+          "parentDataSourceName": "sys_user"
+        }
+      },
+      "_openid": {
+        "default": "",
+        "x-system": true,
+        "x-id": "17b4f9e",
+        "name": "_openid",
+        "format": "",
+        "pattern": "",
+        "description": "仅微信云开发下使用",
+        "type": "string",
+        "title": "记录创建者",
+        "x-index": 18,
+        "x-unique": false
+      },
+      "_id": {
+        "x-system": true,
+        "x-id": "b860f68",
+        "format": "",
+        "type": "string",
+        "title": "数据标识",
+        "x-index": 19,
+        "x-unique": true
+      },
+      "updatedAt": {
+        "default": 0,
+        "x-system": true,
+        "x-id": "e108752",
+        "format": "datetime",
+        "type": "number",
+        "title": "更新时间(系统)",
+        "x-index": 20,
+        "x-unique": false
+      }
+    }
+  },
+  "dbInstanceType": "FLEXDB",
+  "title": "pois",
+  "prodDbInfo": null,
+  "stagingSwitch": false,
+  "name": "pois",
+  "dataHubName": "flexdb",
+  "dbLinkType": "internal",
+  "tableNameRule": "only_name",
+  "type": "database",
+  "previewDbInfo": null,
+  "updateTime": "2026-01-29T14:27:57",
+  "publishedTableName": "pois",
+  "id": "data-5kPCGHfnX",
+  "dbSourceType": "internal_flexdb",
+  "methods": [],
+  "fun": "{\"onlineVersion\": 2, \"onlinePublishAt\": 1769696877218}",
+  "publishStatus": 1,
+  "configuration": {}
+}

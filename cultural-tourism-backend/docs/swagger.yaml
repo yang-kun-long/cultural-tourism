@@ -1,0 +1,288 @@
+basePath: /api
+definitions:
+  models.POI:
+    properties:
+      _id:
+        description: TCB 自动生成的 ID
+        type: string
+      address:
+        description: 详细地址
+        type: string
+      created_at:
+        description: 创建时间 (ISO string)
+        type: string
+      desc:
+        description: 简介
+        type: string
+      images:
+        description: 图片 URL 列表
+        items:
+          type: string
+        type: array
+      latitude:
+        description: 纬度
+        type: number
+      longitude:
+        description: 经度
+        type: number
+      name:
+        description: 名称
+        type: string
+      open_time:
+        description: 营业时间
+        type: string
+      phone:
+        description: 联系电话
+        type: string
+      region_id:
+        description: 所属区域 ID
+        type: string
+      status:
+        description: 状态 1:启用 0:禁用
+        type: integer
+      type:
+        description: 类型 (枚举值)
+        type: string
+      updated_at:
+        description: 更新时间 (ISO string)
+        type: string
+    type: object
+  models.Region:
+    properties:
+      id:
+        type: string
+      name:
+        description: '区域名称 (如: "西湖区", "主景区")'
+        type: string
+      sort:
+        description: 排序权重
+        type: integer
+      status:
+        description: '1: 启用, 0: 禁用'
+        type: integer
+    required:
+    - name
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: 基于 Go + Gin + 腾讯云开发构建的 RESTful API
+  title: 数字文旅后端 API
+  version: "1.0"
+paths:
+  /pois:
+    get:
+      parameters:
+      - description: 区域ID
+        in: query
+        name: region_id
+        type: string
+      - description: 点位类型
+        in: query
+        name: type
+        type: string
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: size
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取点位列表
+      tags:
+      - POI
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: POI Info
+        in: body
+        name: poi
+        required: true
+        schema:
+          $ref: '#/definitions/models.POI'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 创建点位
+      tags:
+      - POI
+  /pois/{id}:
+    delete:
+      parameters:
+      - description: POI ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 删除点位
+      tags:
+      - POI
+    get:
+      parameters:
+      - description: POI ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.POI'
+      summary: 获取点位详情
+      tags:
+      - POI
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: POI ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Info
+        in: body
+        name: poi
+        required: true
+        schema:
+          $ref: '#/definitions/models.POI'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 更新点位
+      tags:
+      - POI
+  /regions:
+    get:
+      consumes:
+      - application/json
+      description: 查询区域列表，支持分页（默认查前100条）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取所有区域
+      tags:
+      - Regions
+    post:
+      consumes:
+      - application/json
+      description: 创建一个新的景区区域 (Name必填)
+      parameters:
+      - description: 区域信息
+        in: body
+        name: region
+        required: true
+        schema:
+          $ref: '#/definitions/models.Region'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 创建区域
+      tags:
+      - Regions
+  /regions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除指定区域
+      parameters:
+      - description: 区域ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 删除区域
+      tags:
+      - Regions
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取单个区域的详细信息
+      parameters:
+      - description: 区域ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取区域详情
+      tags:
+      - Regions
+    put:
+      consumes:
+      - application/json
+      description: 根据 ID 更新区域信息 (支持 name, sort, status)
+      parameters:
+      - description: 区域ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新内容(JSON)
+        in: body
+        name: data
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 更新区域
+      tags:
+      - Regions
+swagger: "2.0"

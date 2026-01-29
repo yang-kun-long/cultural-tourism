@@ -1,0 +1,426 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "基于 Go + Gin + 腾讯云开发构建的 RESTful API",
+        "title": "数字文旅后端 API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "paths": {
+        "/pois": {
+            "get": {
+                "tags": [
+                    "POI"
+                ],
+                "summary": "获取点位列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区域ID",
+                        "name": "region_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "点位类型",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "POI"
+                ],
+                "summary": "创建点位",
+                "parameters": [
+                    {
+                        "description": "POI Info",
+                        "name": "poi",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.POI"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/pois/{id}": {
+            "get": {
+                "tags": [
+                    "POI"
+                ],
+                "summary": "获取点位详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "POI ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.POI"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "POI"
+                ],
+                "summary": "更新点位",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "POI ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Info",
+                        "name": "poi",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.POI"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "POI"
+                ],
+                "summary": "删除点位",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "POI ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/regions": {
+            "get": {
+                "description": "查询区域列表，支持分页（默认查前100条）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "获取所有区域",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建一个新的景区区域 (Name必填)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "创建区域",
+                "parameters": [
+                    {
+                        "description": "区域信息",
+                        "name": "region",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Region"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/regions/{id}": {
+            "get": {
+                "description": "根据 ID 获取单个区域的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "获取区域详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区域ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "根据 ID 更新区域信息 (支持 name, sort, status)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "更新区域",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区域ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新内容(JSON)",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "根据 ID 删除指定区域",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "删除区域",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区域ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.POI": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "TCB 自动生成的 ID",
+                    "type": "string"
+                },
+                "address": {
+                    "description": "详细地址",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "创建时间 (ISO string)",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "简介",
+                    "type": "string"
+                },
+                "images": {
+                    "description": "图片 URL 列表",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "latitude": {
+                    "description": "纬度",
+                    "type": "number"
+                },
+                "longitude": {
+                    "description": "经度",
+                    "type": "number"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "open_time": {
+                    "description": "营业时间",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "联系电话",
+                    "type": "string"
+                },
+                "region_id": {
+                    "description": "所属区域 ID",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "状态 1:启用 0:禁用",
+                    "type": "integer"
+                },
+                "type": {
+                    "description": "类型 (枚举值)",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "更新时间 (ISO string)",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Region": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "description": "区域名称 (如: \"西湖区\", \"主景区\")",
+                    "type": "string"
+                },
+                "sort": {
+                    "description": "排序权重",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "1: 启用, 0: 禁用",
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
