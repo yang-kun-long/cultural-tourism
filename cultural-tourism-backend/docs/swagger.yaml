@@ -2,20 +2,26 @@ basePath: /api
 definitions:
   models.POI:
     properties:
+      _distance:
+        description: '[Audit Fix] 扩展字段：仅用于返回给前端，不存库'
+        type: number
       _id:
-        description: TCB 自动生成的 ID
+        description: TCB 自动 ID
+        type: string
+      _openid:
+        description: '[Audit Fix] 系统字段：记录创建者'
         type: string
       address:
-        description: 详细地址
+        description: 地址
         type: string
       created_at:
-        description: 创建时间 (ISO string)
+        description: 业务创建时间
         type: string
       desc:
         description: 简介
         type: string
       images:
-        description: 图片 URL 列表
+        description: 轮播图
         items:
           type: string
         type: array
@@ -32,36 +38,44 @@ definitions:
         description: 营业时间
         type: string
       phone:
-        description: 联系电话
+        description: 电话
         type: string
       region_id:
-        description: 所属区域 ID
+        description: 所属区域
         type: string
       status:
         description: 状态 1:启用 0:禁用
         type: integer
       type:
-        description: 类型 (枚举值)
+        description: 类型
         type: string
       updated_at:
-        description: 更新时间 (ISO string)
+        description: 业务更新时间
         type: string
     type: object
   models.Region:
     properties:
-      id:
+      _id:
+        description: TCB 自动生成的 ID (String)
+        type: string
+      _openid:
+        description: 系统字段
+        type: string
+      created_at:
+        description: 创建时间
         type: string
       name:
-        description: '区域名称 (如: "西湖区", "主景区")'
+        description: 区域名称
         type: string
       sort:
-        description: 排序权重
+        description: 排序权重 (值越大越靠前)
         type: integer
       status:
         description: '1: 启用, 0: 禁用'
         type: integer
-    required:
-    - name
+      updated_at:
+        description: 更新时间
+        type: string
     type: object
 host: localhost:8080
 info:
@@ -72,15 +86,26 @@ info:
 paths:
   /pois:
     get:
+      description: 查询点位列表，支持按区域、类型筛选。若传入 lat/lng，结果将包含距离信息(_distance)。
       parameters:
       - description: 区域ID
         in: query
         name: region_id
         type: string
-      - description: 点位类型
+      - description: 点位类型 (scenic/food/hotel/booth)
         in: query
         name: type
         type: string
+      - description: 用户纬度 (用于计算距离)
+        format: float64
+        in: query
+        name: lat
+        type: number
+      - description: 用户经度 (用于计算距离)
+        format: float64
+        in: query
+        name: lng
+        type: number
       - description: 页码
         in: query
         name: page
@@ -95,14 +120,15 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: 获取点位列表
+      summary: 获取点位列表 (支持LBS)
       tags:
       - POI
     post:
       consumes:
       - application/json
+      description: 创建新的 POI 点位 (景点/饭店/酒店/旅拍机)
       parameters:
-      - description: POI Info
+      - description: POI信息
         in: body
         name: poi
         required: true
@@ -154,13 +180,14 @@ paths:
     put:
       consumes:
       - application/json
+      description: 更新点位信息 (安全更新，忽略系统字段)
       parameters:
       - description: POI ID
         in: path
         name: id
         required: true
         type: string
-      - description: Update Info
+      - description: 更新信息
         in: body
         name: poi
         required: true
@@ -181,7 +208,20 @@ paths:
     get:
       consumes:
       - application/json
-      description: 查询区域列表，支持分页（默认查前100条）
+      description: 查询区域列表，支持分页
+      parameters:
+      - description: 页码 (默认1)
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量 (默认100)
+        in: query
+        name: size
+        type: integer
+      - description: 状态 (1:启用, 0:禁用)
+        in: query
+        name: status
+        type: integer
       produces:
       - application/json
       responses:
@@ -268,12 +308,12 @@ paths:
         name: id
         required: true
         type: string
-      - description: 更新内容(JSON)
+      - description: 更新内容 (仅需传修改字段)
         in: body
         name: data
         required: true
         schema:
-          type: object
+          $ref: '#/definitions/models.Region'
       produces:
       - application/json
       responses:

@@ -17,10 +17,11 @@ const docTemplate = `{
     "paths": {
         "/pois": {
             "get": {
+                "description": "查询点位列表，支持按区域、类型筛选。若传入 lat/lng，结果将包含距离信息(_distance)。",
                 "tags": [
                     "POI"
                 ],
-                "summary": "获取点位列表",
+                "summary": "获取点位列表 (支持LBS)",
                 "parameters": [
                     {
                         "type": "string",
@@ -30,8 +31,22 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "点位类型",
+                        "description": "点位类型 (scenic/food/hotel/booth)",
                         "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "format": "float64",
+                        "description": "用户纬度 (用于计算距离)",
+                        "name": "lat",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "format": "float64",
+                        "description": "用户经度 (用于计算距离)",
+                        "name": "lng",
                         "in": "query"
                     },
                     {
@@ -58,6 +73,7 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "description": "创建新的 POI 点位 (景点/饭店/酒店/旅拍机)",
                 "consumes": [
                     "application/json"
                 ],
@@ -70,7 +86,7 @@ const docTemplate = `{
                 "summary": "创建点位",
                 "parameters": [
                     {
-                        "description": "POI Info",
+                        "description": "POI信息",
                         "name": "poi",
                         "in": "body",
                         "required": true,
@@ -115,6 +131,7 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "description": "更新点位信息 (安全更新，忽略系统字段)",
                 "consumes": [
                     "application/json"
                 ],
@@ -134,7 +151,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Update Info",
+                        "description": "更新信息",
                         "name": "poi",
                         "in": "body",
                         "required": true,
@@ -180,7 +197,7 @@ const docTemplate = `{
         },
         "/regions": {
             "get": {
-                "description": "查询区域列表，支持分页（默认查前100条）",
+                "description": "查询区域列表，支持分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -191,6 +208,26 @@ const docTemplate = `{
                     "Regions"
                 ],
                 "summary": "获取所有区域",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码 (默认1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量 (默认100)",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "状态 (1:启用, 0:禁用)",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -288,12 +325,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "更新内容(JSON)",
+                        "description": "更新内容 (仅需传修改字段)",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/models.Region"
                         }
                     }
                 ],
@@ -344,16 +381,24 @@ const docTemplate = `{
         "models.POI": {
             "type": "object",
             "properties": {
+                "_distance": {
+                    "description": "[Audit Fix] 扩展字段：仅用于返回给前端，不存库",
+                    "type": "number"
+                },
                 "_id": {
-                    "description": "TCB 自动生成的 ID",
+                    "description": "TCB 自动 ID",
+                    "type": "string"
+                },
+                "_openid": {
+                    "description": "[Audit Fix] 系统字段：记录创建者",
                     "type": "string"
                 },
                 "address": {
-                    "description": "详细地址",
+                    "description": "地址",
                     "type": "string"
                 },
                 "created_at": {
-                    "description": "创建时间 (ISO string)",
+                    "description": "业务创建时间",
                     "type": "string"
                 },
                 "desc": {
@@ -361,7 +406,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "images": {
-                    "description": "图片 URL 列表",
+                    "description": "轮播图",
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -384,11 +429,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
-                    "description": "联系电话",
+                    "description": "电话",
                     "type": "string"
                 },
                 "region_id": {
-                    "description": "所属区域 ID",
+                    "description": "所属区域",
                     "type": "string"
                 },
                 "status": {
@@ -396,35 +441,45 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "type": {
-                    "description": "类型 (枚举值)",
+                    "description": "类型",
                     "type": "string"
                 },
                 "updated_at": {
-                    "description": "更新时间 (ISO string)",
+                    "description": "业务更新时间",
                     "type": "string"
                 }
             }
         },
         "models.Region": {
             "type": "object",
-            "required": [
-                "name"
-            ],
             "properties": {
-                "id": {
+                "_id": {
+                    "description": "TCB 自动生成的 ID (String)",
+                    "type": "string"
+                },
+                "_openid": {
+                    "description": "系统字段",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "创建时间",
                     "type": "string"
                 },
                 "name": {
-                    "description": "区域名称 (如: \"西湖区\", \"主景区\")",
+                    "description": "区域名称",
                     "type": "string"
                 },
                 "sort": {
-                    "description": "排序权重",
+                    "description": "排序权重 (值越大越靠前)",
                     "type": "integer"
                 },
                 "status": {
                     "description": "1: 启用, 0: 禁用",
                     "type": "integer"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
                 }
             }
         }

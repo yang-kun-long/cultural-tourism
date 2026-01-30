@@ -38,19 +38,19 @@
 
 ### Phase 1: 基础设施 [已完成 ✅]
 
-- [x] TCB HTTP Client 核心封装 (已重构为通用 Filter 模式)
-- [x] Swagger 文档集成
-- [x] 统一错误处理
+- [x] TCB HTTP Client 核心封装 (通用 Filter 模式) `[Audit: Pending]`
+- [x] Swagger 文档集成 `[Audit: Pending]`
+- [x] 统一错误处理 `[Audit: Pending]`
 
 ### Phase 2: 基础资源管理 [已完成 ✅]
 
-- [x] **区域管理 (Regions)** (PRD 6.2, 7.1)
+- [x] **区域管理 (Regions)** (PRD 6.2, 7.1) `[Audit: Pending]`
   - [x] 模型: Name, Sort, Status
   - [x] 接口: 增删改查(RESTful)
 
 ### Phase 3: LBS 线下体验 [已完成 ✅]
 
-- [x] **景点点位 (POIs)**
+- [x] **景点点位 (POIs)** (PRD 5.2, 7.1) `[Audit: Pending]`
   - [x] **模型定义**:
     - `type`: 枚举 (scenic/food/hotel/booth)
     - `location`: 经纬度
@@ -64,12 +64,12 @@
 
 > *对应 PRD 5.1, 6.3, 7.1*
 
-- [ ] **旅拍主题 (Themes)**
+- [ ] **旅拍主题 (Themes)** `[Audit: Pending]`
   - [ ] **模型**: Name, Cover, RegionID, Sort, Status
   - [ ] **接口**:
     - [ ] 主题列表: 需支持按 **“区域优先”** 逻辑排序/筛选
     - [ ] 主题详情: 展示封面、简介、瀑布流照片
-- [ ] **照片管理 (Photos)**
+- [ ] **照片管理 (Photos)** `[Audit: Pending]`
   - [ ] **模型**: ThemeID, UserID, URL, Status(待审/通过/下架)
   - [ ] **接口**:
     - [ ] 照片上传 (仅手机相册)
@@ -80,10 +80,10 @@
 
 > *对应 PRD 5.4, 5.5, 6.1, 7.1*
 
-- [ ] **评论互动 (Comments)**
+- [ ] **评论互动 (Comments)** `[Audit: Pending]`
   - [ ] **模型**: POI_ID, Content, UserID, Status, ParentID(盖楼)
   - [ ] **接口**: 发布评论(默认待审)
-- [ ] **商品导流 (Products)**
+- [ ] **商品导流 (Products)** `[Audit: Pending]`
   - [ ] **模型**: Name, Image, Price, JumpAppID, JumpPath
   - [ ] **接口**: 列表(区域优先), 详情(无支付直接跳转)
 
@@ -91,19 +91,19 @@
 
 > *对应 PRD 5.3, 5.6, 7.1*
 
-- [ ] **旅拍机联动 (Booth)**
+- [ ] **旅拍机联动 (Booth)** `[Audit: Pending]`
   - [ ] **接口**: 扫码取图 (关联 BoothOrder/Scan)
-- [ ] **电子相册 (Album)**
+- [ ] **电子相册 (Album)** `[Audit: Pending]`
   - [ ] **逻辑**: 聚合“旅拍机照片”+“线上上传照片”
-- [ ] **收藏体系 (Favorites)**
+- [ ] **收藏体系 (Favorites)** `[Audit: Pending]`
   - [ ] **接口**: 收藏/取消收藏 (对象: Theme/POI/Product)
 
 ### Phase 7: 后台管理与审核 (Admin API)
 
 > *对应 PRD 6.1, 6.4*
 
-- [ ] **内容审核**: 照片/评论的 批量通过/拒绝
-- [ ] **数据统计**: 扫码量, UGC 上传量
+- [ ] **内容审核**: 照片/评论的 批量通过/拒绝 `[Audit: Pending]`
+- [ ] **数据统计**: 扫码量, UGC 上传量 `[Audit: Pending]`
 
 ## 5. 核心数据模型 (Schema Snapshot from PRD 7.1)
 

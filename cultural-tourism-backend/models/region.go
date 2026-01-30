@@ -1,12 +1,13 @@
 // File: models/region.go
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
-
 // Region 区域数据模型
 type Region struct {
-	ID     primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Name   string             `bson:"name" json:"name" binding:"required"` // 区域名称 (如: "西湖区", "主景区")
-	Status int                `bson:"status" json:"status"`                // 1: 启用, 0: 禁用
-	Sort   int                `bson:"sort" json:"sort"`                    // 排序权重
+	ID        string `json:"_id,omitempty"`     // TCB 自动生成的 ID (String)
+	OpenID    string `json:"_openid,omitempty"` // 系统字段
+	Name      string `json:"name"`              // 区域名称
+	Status    int    `json:"status"`            // 1: 启用, 0: 禁用
+	Sort      int    `json:"sort"`              // 排序权重 (值越大越靠前)
+	CreatedAt string `json:"created_at"`        // 创建时间
+	UpdatedAt string `json:"updated_at"`        // 更新时间
 }

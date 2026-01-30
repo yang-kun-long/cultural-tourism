@@ -2,16 +2,16 @@
 package controllers
 
 import (
+	"net/http"
+	"time"
+
 	"cultural-tourism-backend/models"
 	"cultural-tourism-backend/tcb"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-// =================================================================================
-// 区域管理 (Regions) - 标准 REST API
-// =================================================================================
+const CollectionRegion = "regions"
 
 // CreateRegion 创建新区域
 // @Summary      创建区域
@@ -24,58 +24,73 @@ import (
 // @Router       /regions [post]
 func CreateRegion(c *gin.Context) {
 	var region models.Region
-
-	// 1. 绑定参数
 	if err := c.ShouldBindJSON(&region); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	region.Status = 1 // 默认启用
 
-	// 2. 调用云开发 HTTP API 写入数据
-	result, err := tcb.Client.CreateData("regions", region)
+	// 补全默认值
+	region.ID = "" // 安全置空，ID由云开发生成
+	region.Status = 1
+	region.CreatedAt = time.Now().Format(time.RFC3339)
+	region.UpdatedAt = time.Now().Format(time.RFC3339)
+	if region.Sort == 0 {
+		region.Sort = 100 // 默认排序权重
+	}
 
+	result, err := tcb.Client.CreateData(CollectionRegion, region)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":  "调用云开发失败",
-			"detail": err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "创建失败: " + err.Error()})
 		return
 	}
 
-	// 3. 返回结果
-	c.JSON(http.StatusOK, gin.H{
-		"message": "创建成功",
-		"data":    result,
-	})
+	c.JSON(http.StatusOK, result)
 }
 
 // GetRegions 获取区域列表
 // @Summary      获取所有区域
-// @Description  查询区域列表，支持分页（默认查前100条）
+// @Description  查询区域列表，支持分页
 // @Tags         Regions
 // @Accept       json
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param        page    query     int     false  "页码 (默认1)"
+// @Param        size    query     int     false  "每页数量 (默认100)"
+// @Param        status  query     int     false  "状态 (1:启用, 0:禁用)"
+// @Success      200     {object}  map[string]interface{}
 // @Router       /regions [get]
 func GetRegions(c *gin.Context) {
-	// 调用 ListData 方法
-	// 【修正】增加 nil 参数，对应 ListData 新增的 filter 参数
-	// 第 1 页，每页 100 条 (足够覆盖所有景区区域)
-	result, err := tcb.Client.ListData("regions", nil, 1, 100)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":  "查询失败",
-			"detail": err.Error(),
-		})
+	// 获取分页参数
+	type Query struct {
+		Page   int `form:"page,default=1"`
+		Size   int `form:"size,default=100"`
+		Status int `form:"status,default=1"`
+	}
+	var query Query
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "获取成功",
-		"data":    result["data"], // 将腾讯云返回的 data 字段透传给前端
-	})
+	// 1. 构造筛选条件
+	where := map[string]interface{}{
+		"status": map[string]interface{}{
+			"$eq": query.Status,
+		},
+	}
+
+	filter := map[string]interface{}{
+		"where": where,
+		// TODO: 等待 SDK 支持 orderBy
+	}
+
+	// 2. 调用 SDK
+	result, err := tcb.Client.ListData(CollectionRegion, filter, query.Page, query.Size)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "查询失败: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
 }
 
 // GetRegionDetail 获取单条区域详情
@@ -94,13 +109,13 @@ func GetRegionDetail(c *gin.Context) {
 		return
 	}
 
-	result, err := tcb.Client.GetDetail("regions", id)
+	result, err := tcb.Client.GetDetail(CollectionRegion, id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "查询失败或记录不存在", "detail": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": "区域不存在"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": result})
+	c.JSON(http.StatusOK, result)
 }
 
 // UpdateRegion 更新区域
@@ -109,38 +124,41 @@ func GetRegionDetail(c *gin.Context) {
 // @Tags         Regions
 // @Accept       json
 // @Produce      json
-// @Param        id    path      string  true  "区域ID"
-// @Param        data  body      object  true  "更新内容(JSON)"
+// @Param        id    path      string         true  "区域ID"
+// @Param        data  body      models.Region  true  "更新内容 (仅需传修改字段)"
 // @Success      200   {object}  map[string]interface{}
 // @Router       /regions/{id} [put]
 func UpdateRegion(c *gin.Context) {
 	id := c.Param("id")
-	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID不能为空"})
+	var region models.Region
+	if err := c.ShouldBindJSON(&region); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
 
-	// 定义一个只包含需要更新字段的结构体
-	// 这里为了简单，我们允许更新 name, sort, status
-	var updateData struct {
-		Name   string `json:"name"`
-		Sort   int    `json:"sort"`
-		Status int    `json:"status"`
+	// [Security Fix] 使用 Map 构造更新数据，支持 Partial Update
+	updateData := map[string]interface{}{
+		"updated_at": time.Now().Format(time.RFC3339),
 	}
 
-	if err := c.ShouldBindJSON(&updateData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误: " + err.Error()})
-		return
+	if region.Name != "" {
+		updateData["name"] = region.Name
+	}
+	if region.Sort > 0 {
+		updateData["sort"] = region.Sort
+	}
+	// 简单处理：只有非0才更新。如果需要更新为0，建议使用 map[string]interface{} 接收参数
+	if region.Status != 0 {
+		updateData["status"] = region.Status
 	}
 
-	// 调用更新
-	err := tcb.Client.UpdateData("regions", id, updateData)
+	err := tcb.Client.UpdateData(CollectionRegion, id, updateData)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新失败", "detail": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新失败: " + err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "更新成功", "id": id})
+	c.JSON(http.StatusOK, gin.H{"success": true, "id": id})
 }
 
 // DeleteRegion 删除区域
@@ -153,26 +171,11 @@ func UpdateRegion(c *gin.Context) {
 // @Success      200  {object}  map[string]interface{}
 // @Router       /regions/{id} [delete]
 func DeleteRegion(c *gin.Context) {
-	// 1. 从 URL 路径参数获取 id
 	id := c.Param("id")
-	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID不能为空"})
-		return
-	}
-
-	// 2. 调用云开发删除
-	err := tcb.Client.DeleteData("regions", id)
+	err := tcb.Client.DeleteData(CollectionRegion, id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":  "删除失败",
-			"detail": err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "删除失败"})
 		return
 	}
-
-	// 3. 返回成功
-	c.JSON(http.StatusOK, gin.H{
-		"message": "删除成功",
-		"id":      id,
-	})
+	c.JSON(http.StatusOK, gin.H{"success": true, "id": id})
 }
