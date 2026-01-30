@@ -46,5 +46,12 @@ func RegisterRoutes(r *gin.Engine) {
 		api.GET("/themes/:id", controllers.GetThemeDetail) // 详情
 		api.PUT("/themes/:id", controllers.UpdateTheme)    // 更新
 		api.DELETE("/themes/:id", controllers.DeleteTheme) // 删除
+
+		// ================= Phase 4 (Part 2): UGC 照片管理 (Photos) =================
+		api.POST("/photos", controllers.CreatePhoto)       // 上传 (默认待审)
+		api.GET("/photos", controllers.GetPhotoList)       // 瀑布流 (默认查已过审)
+		api.GET("/photos/:id", controllers.GetPhotoDetail) // 详情
+		api.PUT("/photos/:id", controllers.UpdatePhoto)    // 审核/点赞
+		api.DELETE("/photos/:id", controllers.DeletePhoto) // 删除
 	}
 }

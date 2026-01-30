@@ -53,6 +53,33 @@ definitions:
         description: 业务更新时间
         type: string
     type: object
+  models.Photo:
+    properties:
+      _id:
+        description: TCB 自动生成的 ID
+        type: string
+      _openid:
+        description: 系统字段：发布者 (用户ID)
+        type: string
+      created_at:
+        description: 业务创建时间
+        type: string
+      image_url:
+        description: 照片云存储 URL
+        type: string
+      like_count:
+        description: 点赞数 (用于热门排序)
+        type: integer
+      status:
+        description: '审核状态: 0=待审(默认), 1=通过, 2=拒绝'
+        type: integer
+      theme_id:
+        description: 关联的主题 ID
+        type: string
+      updated_at:
+        description: 业务更新时间 (审核时间)
+        type: string
+    type: object
   models.Region:
     properties:
       _id:
@@ -117,6 +144,118 @@ info:
   title: 数字文旅后端 API
   version: "1.0"
 paths:
+  /photos:
+    get:
+      description: 支持按主题ID筛选，默认只显示审核通过(status=1)的照片
+      parameters:
+      - description: 主题ID
+        in: query
+        name: theme_id
+        type: string
+      - description: 状态 (1:通过, 0:待审)
+        in: query
+        name: status
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: size
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取照片列表
+      tags:
+      - Photos
+    post:
+      consumes:
+      - application/json
+      description: 用户上传旅拍照片 (上传后默认为待审核状态 status=0)
+      parameters:
+      - description: 照片信息
+        in: body
+        name: photo
+        required: true
+        schema:
+          $ref: '#/definitions/models.Photo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 上传照片
+      tags:
+      - Photos
+  /photos/{id}:
+    delete:
+      description: 管理员可删除违规照片，用户可删除自己的照片(依赖TCB权限)
+      parameters:
+      - description: 照片ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 删除照片
+      tags:
+      - Photos
+    get:
+      parameters:
+      - description: 照片ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取照片详情
+      tags:
+      - Photos
+    put:
+      consumes:
+      - application/json
+      description: 用于管理员审核 (修改status) 或 用户点赞 (修改like_count)
+      parameters:
+      - description: 照片ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新内容 (仅status/like_count)
+        in: body
+        name: photo
+        required: true
+        schema:
+          $ref: '#/definitions/models.Photo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 更新照片 (审核/点赞)
+      tags:
+      - Photos
   /pois:
     get:
       description: 查询点位列表，支持按区域、类型筛选。若传入 lat/lng，结果将包含距离信息(_distance)。

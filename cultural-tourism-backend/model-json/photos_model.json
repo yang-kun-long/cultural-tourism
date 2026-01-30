@@ -1,0 +1,135 @@
+{
+    "previewTableName": "",
+    "publishCacheStatus": "notready",
+    "subType": "database",
+    "schema": {
+        "x-primary-column": "_id",
+        "x-kind": "tcb",
+        "type": "object",
+        "required": [
+            "theme_id",
+            "image_url"
+        ],
+        "properties": {
+            "theme_id": {
+                "type": "string",
+                "title": "关联主题ID",
+                "description": "关联 themes 表 _id",
+                "x-index": 0,
+                "x-filter": true
+            },
+            "image_url": {
+                "type": "string",
+                "title": "照片URL",
+                "x-index": 1
+            },
+            "status": {
+                "type": "number",
+                "title": "审核状态",
+                "description": "0:待审, 1:通过, 2:拒绝",
+                "default": 0,
+                "x-index": 2,
+                "x-filter": true
+            },
+            "like_count": {
+                "type": "number",
+                "title": "点赞数",
+                "default": 0,
+                "x-index": 3,
+                "x-sort": true
+            },
+            "created_at": {
+                "type": "string",
+                "title": "业务创建时间",
+                "format": "date-time",
+                "x-index": 4,
+                "x-sort": true
+            },
+            "updated_at": {
+                "type": "string",
+                "title": "业务更新时间",
+                "format": "date-time",
+                "x-index": 5
+            },
+            "owner": {
+                "default": "",
+                "x-system": true,
+                "x-id": "34023b4",
+                "name": "owner",
+                "x-hidden": true,
+                "type": "string",
+                "title": "所有人",
+                "x-index": 6
+            },
+            "_mainDep": {
+                "x-system": true,
+                "x-id": "03475ac",
+                "name": "_mainDep",
+                "x-hidden": true,
+                "type": "string",
+                "title": "所属主管部门",
+                "x-index": 7
+            },
+            "createdAt": {
+                "default": 0,
+                "x-system": true,
+                "x-id": "d7748fa",
+                "format": "datetime",
+                "type": "number",
+                "title": "系统创建时间",
+                "x-index": 8
+            },
+            "createBy": {
+                "default": "",
+                "x-system": true,
+                "x-id": "7c32128",
+                "name": "createBy",
+                "x-hidden": true,
+                "type": "string",
+                "title": "创建人",
+                "x-index": 9
+            },
+            "updateBy": {
+                "default": "",
+                "x-system": true,
+                "x-id": "93a079a",
+                "name": "updateBy",
+                "x-hidden": true,
+                "type": "string",
+                "title": "修改人",
+                "x-index": 10
+            },
+            "_openid": {
+                "default": "",
+                "x-system": true,
+                "x-id": "d20bcdd",
+                "name": "_openid",
+                "type": "string",
+                "title": "记录创建者",
+                "x-index": 11
+            },
+            "_id": {
+                "x-system": true,
+                "x-id": "5a77c28",
+                "type": "string",
+                "title": "数据标识",
+                "x-index": 12,
+                "x-unique": true
+            },
+            "updatedAt": {
+                "default": 0,
+                "x-system": true,
+                "x-id": "480f94f",
+                "format": "datetime",
+                "type": "number",
+                "title": "系统更新时间",
+                "x-index": 13
+            }
+        }
+    },
+    "dbInstanceType": "FLEXDB",
+    "title": "photo",
+    "name": "photo",
+    "tableNameRule": "only_name",
+    "type": "database"
+}
