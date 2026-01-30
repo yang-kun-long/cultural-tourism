@@ -375,6 +375,173 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/themes": {
+            "get": {
+                "description": "支持按区域筛选。实现PRD“区域优先推荐”：前端应先传region_id查询，若为空则不传region_id查全局。",
+                "tags": [
+                    "Themes"
+                ],
+                "summary": "获取主题列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区域ID",
+                        "name": "region_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "状态 (1:启用)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建新的旅拍活动主题 (仅管理员)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Themes"
+                ],
+                "summary": "创建旅拍主题",
+                "parameters": [
+                    {
+                        "description": "主题信息",
+                        "name": "theme",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Theme"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/themes/{id}": {
+            "get": {
+                "tags": [
+                    "Themes"
+                ],
+                "summary": "获取主题详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "主题ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "更新主题信息 (支持增量更新)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Themes"
+                ],
+                "summary": "更新主题",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "主题ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新内容",
+                        "name": "theme",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Theme"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Themes"
+                ],
+                "summary": "删除主题",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "主题ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -479,6 +646,51 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "description": "更新时间",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Theme": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "TCB 自动生成的 ID",
+                    "type": "string"
+                },
+                "_openid": {
+                    "description": "系统字段：创建者",
+                    "type": "string"
+                },
+                "cover": {
+                    "description": "封面图 URL",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "业务创建时间",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "主题简介",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "主题名称 (如: \"汉服打卡\")",
+                    "type": "string"
+                },
+                "region_id": {
+                    "description": "所属区域 ID (用于实现 PRD 5.1.1 区域优先推荐)",
+                    "type": "string"
+                },
+                "sort": {
+                    "description": "排序权重 (默认 100)",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "1:启用 0:禁用",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "description": "业务更新时间",
                     "type": "string"
                 }
             }

@@ -38,37 +38,38 @@
 
 ### Phase 1: 基础设施 [已完成 ✅]
 
-- [x] TCB HTTP Client 核心封装 (通用 Filter 模式) `[Audit: Pending]`
-- [x] Swagger 文档集成 `[Audit: Pending]`
-- [x] 统一错误处理 `[Audit: Pending]`
+- [x] TCB HTTP Client 核心封装 (通用 Filter 模式) `[Audit: Passed]`
+- [x] Swagger 文档集成 `[Audit: Passed]`
+- [x] 统一错误处理 `[Audit: Passed]`
 
 ### Phase 2: 基础资源管理 [已完成 ✅]
 
-- [x] **区域管理 (Regions)** (PRD 6.2, 7.1) `[Audit: Pending]`
+- [x] **区域管理 (Regions)** (PRD 6.2, 7.1) `[Audit: Passed]`
   - [x] 模型: Name, Sort, Status
   - [x] 接口: 增删改查(RESTful)
 
 ### Phase 3: LBS 线下体验 [已完成 ✅]
 
-- [x] **景点点位 (POIs)** (PRD 5.2, 7.1) `[Audit: Pending]`
+- [x] **景点点位 (POIs)** (PRD 5.2, 7.1) `[Audit: Passed]`
   - [x] **模型定义**:
     - `type`: 枚举 (scenic/food/hotel/booth)
-    - `location`: 经纬度
+    - `location`: 经纬度 (Go层计算距离)
     - `info`: 轮播图, 简介, 营业时间, 电话
     - `system`: 包含 _openid, owner 等完整系统字段
   - [x] **接口开发**:
     - [x] 增删改查 (CRUD 核心闭环)
     - [x] 列表查询 (支持分页与区域/类型筛选)
+    - [x] LBS 距离计算 (Haversine Algorithm)
 
-### Phase 4: UGC 旅拍社区 [待启动 ⏳]
+### Phase 4: UGC 旅拍社区 [进行中 🔄]
 
 > *对应 PRD 5.1, 6.3, 7.1*
 
-- [ ] **旅拍主题 (Themes)** `[Audit: Pending]`
-  - [ ] **模型**: Name, Cover, RegionID, Sort, Status
-  - [ ] **接口**:
-    - [ ] 主题列表: 需支持按 **“区域优先”** 逻辑排序/筛选
-    - [ ] 主题详情: 展示封面、简介、瀑布流照片
+- [x] **旅拍主题 (Themes)** `[Audit: Passed]`
+  - [x] **模型**: Name, Cover, RegionID, Sort, Status, Desc
+  - [x] **接口**:
+    - [x] 主题列表: 支持按 **“区域优先”** (region_id) 筛选
+    - [x] 主题详情: 展示封面、简介
 - [ ] **照片管理 (Photos)** `[Audit: Pending]`
   - [ ] **模型**: ThemeID, UserID, URL, Status(待审/通过/下架)
   - [ ] **接口**:
@@ -129,7 +130,23 @@
   "phone": "string",
   "open_time": "string",
   "status": "number",
-  "_openid": "string (system, default: anon)",
+  "_openid": "string (system)",
+  "_id": "..."
+}
+
+```
+
+### `themes` (Collection Name: `theme`) (已上线)
+
+```json
+{
+  "name": "string",
+  "cover": "string",
+  "desc": "string",
+  "region_id": "string (ref: regions._id)",
+  "sort": "number",
+  "status": "number",
+  "_openid": "string (system)",
   "_id": "..."
 }
 
@@ -143,21 +160,24 @@
 │   └── config.go
 ├── controllers
 │   ├── poi_controller.go
-│   └── region_controller.go
+│   ├── region_controller.go
+│   └── theme_controller.go  # [新增]
 ├── database
 │   └── db.go
 ├── model-json
 │   ├── regions_model.json
-│   └── pois_model.json
+│   ├── pois_model.json
+│   └── themes_model.json    # [新增]
 ├── models
 │   ├── poi.go
-│   └── region.go
+│   ├── region.go
+│   └── theme.go             # [新增]
 ├── routes
 │   └── router.go
 ├── tcb
-│   └── client.go  # [核心] TCB SDK (已修正为通用 Filter)
+│   └── client.go
 ├── go.mod
-├── main.go  # [入口]
+├── main.go
 └── PROJECT_CONTEXT.md
 
 ```

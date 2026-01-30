@@ -77,6 +77,39 @@ definitions:
         description: 更新时间
         type: string
     type: object
+  models.Theme:
+    properties:
+      _id:
+        description: TCB 自动生成的 ID
+        type: string
+      _openid:
+        description: 系统字段：创建者
+        type: string
+      cover:
+        description: 封面图 URL
+        type: string
+      created_at:
+        description: 业务创建时间
+        type: string
+      desc:
+        description: 主题简介
+        type: string
+      name:
+        description: '主题名称 (如: "汉服打卡")'
+        type: string
+      region_id:
+        description: 所属区域 ID (用于实现 PRD 5.1.1 区域优先推荐)
+        type: string
+      sort:
+        description: 排序权重 (默认 100)
+        type: integer
+      status:
+        description: 1:启用 0:禁用
+        type: integer
+      updated_at:
+        description: 业务更新时间
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -325,4 +358,115 @@ paths:
       summary: 更新区域
       tags:
       - Regions
+  /themes:
+    get:
+      description: 支持按区域筛选。实现PRD“区域优先推荐”：前端应先传region_id查询，若为空则不传region_id查全局。
+      parameters:
+      - description: 区域ID
+        in: query
+        name: region_id
+        type: string
+      - description: 状态 (1:启用)
+        in: query
+        name: status
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: size
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取主题列表
+      tags:
+      - Themes
+    post:
+      consumes:
+      - application/json
+      description: 创建新的旅拍活动主题 (仅管理员)
+      parameters:
+      - description: 主题信息
+        in: body
+        name: theme
+        required: true
+        schema:
+          $ref: '#/definitions/models.Theme'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 创建旅拍主题
+      tags:
+      - Themes
+  /themes/{id}:
+    delete:
+      parameters:
+      - description: 主题ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 删除主题
+      tags:
+      - Themes
+    get:
+      parameters:
+      - description: 主题ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取主题详情
+      tags:
+      - Themes
+    put:
+      consumes:
+      - application/json
+      description: 更新主题信息 (支持增量更新)
+      parameters:
+      - description: 主题ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新内容
+        in: body
+        name: theme
+        required: true
+        schema:
+          $ref: '#/definitions/models.Theme'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 更新主题
+      tags:
+      - Themes
 swagger: "2.0"

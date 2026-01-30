@@ -34,11 +34,17 @@ func RegisterRoutes(r *gin.Engine) {
 		api.DELETE("/regions/:id", controllers.DeleteRegion)
 
 		// === Phase 3: POI (点位管理) ===
-		// === Phase 3: POI (点位管理) ===
 		api.POST("/pois", controllers.CreatePOI)       // 创建
 		api.GET("/pois", controllers.GetPOIList)       // 列表 (支持 region_id, type 筛选)
 		api.GET("/pois/:id", controllers.GetPOI)       // 详情
 		api.PUT("/pois/:id", controllers.UpdatePOI)    // 更新
 		api.DELETE("/pois/:id", controllers.DeletePOI) // 删除
+
+		// ================= Phase 4: UGC 旅拍主题 (Themes) =================
+		api.POST("/themes", controllers.CreateTheme)       // 创建主题
+		api.GET("/themes", controllers.GetThemeList)       // 列表 (支持 ?region_id=...)
+		api.GET("/themes/:id", controllers.GetThemeDetail) // 详情
+		api.PUT("/themes/:id", controllers.UpdateTheme)    // 更新
+		api.DELETE("/themes/:id", controllers.DeleteTheme) // 删除
 	}
 }
