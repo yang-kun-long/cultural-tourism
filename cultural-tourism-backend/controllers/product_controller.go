@@ -3,16 +3,12 @@ package controllers
 
 import (
 	"net/http"
-	"time"
 
 	"cultural-tourism-backend/models"
-	"cultural-tourism-backend/tcb"
+	"cultural-tourism-backend/services"
 
 	"github.com/gin-gonic/gin"
 )
-
-// [Critical] 数据库实际集合名为单数 "product"
-const CollectionProduct = "product"
 
 // CreateProduct 创建商品导流
 // @Summary      创建商品导流
@@ -30,11 +26,7 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
-	product.ID = ""
-	product.CreatedAt = time.Now().Format(time.RFC3339)
-	product.UpdatedAt = time.Now().Format(time.RFC3339)
-
-	result, err := tcb.Client.CreateData(CollectionProduct, product)
+	result, err := services.CreateProduct(&product)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "创建失败: " + err.Error()})
 		return
@@ -58,7 +50,7 @@ func GetProductList(c *gin.Context) {
 		return
 	}
 
-	result, err := tcb.Client.ListData(CollectionProduct, nil, query.Page, query.Size)
+	result, err := services.ListProducts(query)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "查询失败: " + err.Error()})
 		return
@@ -80,7 +72,7 @@ func GetProductDetail(c *gin.Context) {
 		return
 	}
 
-	result, err := tcb.Client.GetDetail(CollectionProduct, id)
+	result, err := services.GetProductDetail(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "商品不存在"})
 		return
@@ -107,27 +99,8 @@ func UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	updateData := map[string]interface{}{
-		"updated_at": time.Now().Format(time.RFC3339),
-	}
-
-	if product.Name != "" {
-		updateData["name"] = product.Name
-	}
-	if product.Image != "" {
-		updateData["image"] = product.Image
-	}
-	if product.Price != 0 {
-		updateData["price"] = product.Price
-	}
-	if product.JumpAppID != "" {
-		updateData["jump_app_id"] = product.JumpAppID
-	}
-	if product.JumpPath != "" {
-		updateData["jump_path"] = product.JumpPath
-	}
-
-	if err := tcb.Client.UpdateData(CollectionProduct, id, updateData); err != nil {
+	err := services.UpdateProduct(id, &product)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新失败: " + err.Error()})
 		return
 	}
@@ -143,10 +116,10 @@ func UpdateProduct(c *gin.Context) {
 // @Router       /products/{id} [delete]
 func DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
-	if err := tcb.Client.DeleteData(CollectionProduct, id); err != nil {
+	err := services.DeleteProduct(id)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "删除失败"})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"success": true, "id": id})
 }

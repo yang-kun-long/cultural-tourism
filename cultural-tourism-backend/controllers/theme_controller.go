@@ -103,7 +103,7 @@ func GetThemeDetail(c *gin.Context) {
 		return
 	}
 
-	result, err := tcb.Client.GetDetail(CollectionTheme, id)
+	result, err := services.GetThemeDetail(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "主题不存在"})
 		return

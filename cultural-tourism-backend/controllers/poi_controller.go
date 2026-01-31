@@ -140,7 +140,7 @@ func GetPOI(c *gin.Context) {
 		return
 	}
 
-	result, err := tcb.Client.GetDetail(CollectionPOI, id)
+	result, err := services.GetPOIDetail(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "POI not found"})
 		return
