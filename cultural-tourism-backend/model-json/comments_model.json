@@ -1,0 +1,133 @@
+{
+    "previewTableName": "",
+    "publishCacheStatus": "notready",
+    "subType": "database",
+    "schema": {
+        "x-primary-column": "_id",
+        "x-kind": "tcb",
+        "type": "object",
+        "required": [
+            "poi_id",
+            "content"
+        ],
+        "properties": {
+            "poi_id": {
+                "type": "string",
+                "title": "关联点位ID",
+                "description": "关联 pois 表 _id",
+                "x-index": 0,
+                "x-filter": true
+            },
+            "parent_id": {
+                "type": "string",
+                "title": "父评论ID",
+                "description": "空字符串表示一级评论",
+                "x-index": 1,
+                "x-filter": true
+            },
+            "content": {
+                "type": "string",
+                "title": "评论内容",
+                "x-index": 2
+            },
+            "status": {
+                "type": "number",
+                "title": "审核状态",
+                "description": "0:待审, 1:通过, 2:拒绝",
+                "default": 0,
+                "x-index": 3,
+                "x-filter": true
+            },
+            "like_count": {
+                "type": "number",
+                "title": "点赞数",
+                "default": 0,
+                "x-index": 4,
+                "x-sort": true
+            },
+            "created_at": {
+                "type": "string",
+                "title": "业务创建时间",
+                "format": "date-time",
+                "x-index": 5,
+                "x-sort": true
+            },
+            "updated_at": {
+                "type": "string",
+                "title": "业务更新时间",
+                "format": "date-time",
+                "x-index": 6
+            },
+            "_openid": {
+                "type": "string",
+                "title": "用户标识",
+                "description": "系统字段: 用户唯一标识",
+                "x-system": true,
+                "x-index": 7
+            },
+            "owner": {
+                "default": "",
+                "x-system": true,
+                "x-id": "34023b4",
+                "name": "owner",
+                "x-hidden": true,
+                "type": "string",
+                "title": "所有人",
+                "x-index": 8
+            },
+
+            "_mainDep": {
+                "x-system": true,
+                "x-id": "03475ac",
+                "name": "_mainDep",
+                "x-hidden": true,
+                "type": "string",
+                "title": "所属主管部门",
+                "x-index": 8
+            },
+            "createdAt": {
+                "default": 0,
+                "x-system": true,
+                "x-id": "0c0f2d1",
+                "format": "datetime",
+                "type": "number",
+                "title": "系统创建时间",
+                "x-index": 9
+            },
+            "createBy": {
+                "default": "",
+                "x-system": true,
+                "x-id": "6e2d7c1",
+                "name": "createBy",
+                "x-hidden": true,
+                "type": "string",
+                "title": "创建人",
+                "x-index": 10
+            },
+            "updateBy": {
+                "default": "",
+                "x-system": true,
+                "x-id": "a7f83c2",
+                "name": "updateBy",
+                "x-hidden": true,
+                "type": "string",
+                "title": "修改人",
+                "x-index": 11
+            },
+            "updatedAt": {
+                "default": 0,
+                "x-system": true,
+                "x-id": "480f94f",
+                "format": "datetime",
+                "type": "number",
+                "title": "系统更新时间",
+                "x-index": 12
+            }
+        }
+    },
+    "dbInstanceType": "FLEXDB",
+    "title": "comment",
+    "name": "comment",
+    "tableNameRule": "only_name",
+    "type": "database"
+}

@@ -9,6 +9,174 @@
     "host": "localhost:8080",
     "basePath": "/api",
     "paths": {
+        "/comments": {
+            "get": {
+                "description": "默认只显示审核通过(status=1)的评论",
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "获取评论列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "点位ID",
+                        "name": "poi_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "状态 (1:通过, 0:待审)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "用户发布评论 (默认待审核 status=0)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "发布评论",
+                "parameters": [
+                    {
+                        "description": "评论信息",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/comments/{id}": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "获取评论详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "评论ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "用于管理员审核 (修改status) 或 用户点赞 (修改like_count)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "更新评论 (审核/点赞)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "评论ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新内容 (仅status/like_count)",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "管理员可删除违规评论，用户可删除自己的评论(依赖TCB权限)",
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "删除评论",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "评论ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/photos": {
             "get": {
                 "description": "支持按主题ID筛选，默认只显示审核通过(status=1)的照片",
@@ -341,6 +509,161 @@
                     {
                         "type": "string",
                         "description": "POI ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/products": {
+            "get": {
+                "description": "商品导流列表（无支付，点击跳转）",
+                "tags": [
+                    "Products"
+                ],
+                "summary": "获取商品列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建商品导流信息 (无支付，仅跳转)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "创建商品导流",
+                "parameters": [
+                    {
+                        "description": "商品信息",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Product"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "获取商品详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "商品ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "更新商品导流信息 (支持增量更新)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "更新商品导流",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "商品ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新内容",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Product"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "删除商品导流",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "商品ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -707,6 +1030,47 @@
         }
     },
     "definitions": {
+        "models.Comment": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "TCB 自动 ID",
+                    "type": "string"
+                },
+                "_openid": {
+                    "description": "发布者 (系统字段)",
+                    "type": "string"
+                },
+                "content": {
+                    "description": "评论内容",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "业务创建时间",
+                    "type": "string"
+                },
+                "like_count": {
+                    "description": "点赞数",
+                    "type": "integer"
+                },
+                "parent_id": {
+                    "description": "父评论 ID (空字符串表示一级评论)",
+                    "type": "string"
+                },
+                "poi_id": {
+                    "description": "关联的点位 ID",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "0:待审, 1:通过, 2:拒绝",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "description": "业务更新时间",
+                    "type": "string"
+                }
+            }
+        },
         "models.POI": {
             "type": "object",
             "properties": {
@@ -812,6 +1176,47 @@
                 },
                 "updated_at": {
                     "description": "业务更新时间 (审核时间)",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Product": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "TCB 自动生成的 ID",
+                    "type": "string"
+                },
+                "_openid": {
+                    "description": "系统字段：创建者",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "业务创建时间",
+                    "type": "string"
+                },
+                "image": {
+                    "description": "商品图片 URL",
+                    "type": "string"
+                },
+                "jump_app_id": {
+                    "description": "跳转小程序 AppID",
+                    "type": "string"
+                },
+                "jump_path": {
+                    "description": "跳转路径",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "商品名称",
+                    "type": "string"
+                },
+                "price": {
+                    "description": "商品价格 (仅展示，无支付)",
+                    "type": "number"
+                },
+                "updated_at": {
+                    "description": "业务更新时间",
                     "type": "string"
                 }
             }

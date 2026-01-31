@@ -1,0 +1,1107 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "基于 Go + Gin + 腾讯云开发构建的 RESTful API",
+        "title": "数字文旅后端 API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "paths": {
+        "/comments": {
+            "get": {
+                "description": "默认只显示审核通过(status=1)的评论",
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "获取评论列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "点位ID",
+                        "name": "poi_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "状态 (1:通过, 0:待审)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "用户发布评论 (默认待审核 status=0)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "发布评论",
+                "parameters": [
+                    {
+                        "description": "评论信息",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/comments/{id}": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "获取评论详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "评论ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "用于管理员审核 (修改status) 或 用户点赞 (修改like_count)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "更新评论 (审核/点赞)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "评论ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新内容 (仅status/like_count)",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "管理员可删除违规评论，用户可删除自己的评论(依赖TCB权限)",
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "删除评论",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "评论ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/photos": {
+            "get": {
+                "description": "支持按主题ID筛选，默认只显示审核通过(status=1)的照片",
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "获取照片列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "主题ID",
+                        "name": "theme_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "状态 (1:通过, 0:待审)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "用户上传旅拍照片 (上传后默认为待审核状态 status=0)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "上传照片",
+                "parameters": [
+                    {
+                        "description": "照片信息",
+                        "name": "photo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Photo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/photos/{id}": {
+            "get": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "获取照片详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "照片ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "用于管理员审核 (修改status) 或 用户点赞 (修改like_count)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "更新照片 (审核/点赞)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "照片ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新内容 (仅status/like_count)",
+                        "name": "photo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Photo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "管理员可删除违规照片，用户可删除自己的照片(依赖TCB权限)",
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "删除照片",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "照片ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/pois": {
+            "get": {
+                "description": "查询点位列表，支持按区域、类型筛选。若传入 lat/lng，结果将包含距离信息(_distance)。",
+                "tags": [
+                    "POI"
+                ],
+                "summary": "获取点位列表 (支持LBS)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区域ID",
+                        "name": "region_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "点位类型 (scenic/food/hotel/booth)",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "format": "float64",
+                        "description": "用户纬度 (用于计算距离)",
+                        "name": "lat",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "format": "float64",
+                        "description": "用户经度 (用于计算距离)",
+                        "name": "lng",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建新的 POI 点位 (景点/饭店/酒店/旅拍机)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "POI"
+                ],
+                "summary": "创建点位",
+                "parameters": [
+                    {
+                        "description": "POI信息",
+                        "name": "poi",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.POI"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/pois/{id}": {
+            "get": {
+                "tags": [
+                    "POI"
+                ],
+                "summary": "获取点位详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "POI ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.POI"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "更新点位信息 (安全更新，忽略系统字段)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "POI"
+                ],
+                "summary": "更新点位",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "POI ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新信息",
+                        "name": "poi",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.POI"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "POI"
+                ],
+                "summary": "删除点位",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "POI ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/regions": {
+            "get": {
+                "description": "查询区域列表，支持分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "获取所有区域",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码 (默认1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量 (默认100)",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "状态 (1:启用, 0:禁用)",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建一个新的景区区域 (Name必填)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "创建区域",
+                "parameters": [
+                    {
+                        "description": "区域信息",
+                        "name": "region",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Region"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/regions/{id}": {
+            "get": {
+                "description": "根据 ID 获取单个区域的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "获取区域详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区域ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "根据 ID 更新区域信息 (支持 name, sort, status)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "更新区域",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区域ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新内容 (仅需传修改字段)",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Region"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "根据 ID 删除指定区域",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "删除区域",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区域ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/themes": {
+            "get": {
+                "description": "支持按区域筛选。实现PRD“区域优先推荐”：前端应先传region_id查询，若为空则不传region_id查全局。",
+                "tags": [
+                    "Themes"
+                ],
+                "summary": "获取主题列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区域ID",
+                        "name": "region_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "状态 (1:启用)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建新的旅拍活动主题 (仅管理员)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Themes"
+                ],
+                "summary": "创建旅拍主题",
+                "parameters": [
+                    {
+                        "description": "主题信息",
+                        "name": "theme",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Theme"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/themes/{id}": {
+            "get": {
+                "tags": [
+                    "Themes"
+                ],
+                "summary": "获取主题详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "主题ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "更新主题信息 (支持增量更新)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Themes"
+                ],
+                "summary": "更新主题",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "主题ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新内容",
+                        "name": "theme",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Theme"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Themes"
+                ],
+                "summary": "删除主题",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "主题ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Comment": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "TCB 自动 ID",
+                    "type": "string"
+                },
+                "_openid": {
+                    "description": "发布者 (系统字段)",
+                    "type": "string"
+                },
+                "content": {
+                    "description": "评论内容",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "业务创建时间",
+                    "type": "string"
+                },
+                "like_count": {
+                    "description": "点赞数",
+                    "type": "integer"
+                },
+                "parent_id": {
+                    "description": "父评论 ID (空字符串表示一级评论)",
+                    "type": "string"
+                },
+                "poi_id": {
+                    "description": "关联的点位 ID",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "0:待审, 1:通过, 2:拒绝",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "description": "业务更新时间",
+                    "type": "string"
+                }
+            }
+        },
+        "models.POI": {
+            "type": "object",
+            "properties": {
+                "_distance": {
+                    "description": "[Audit Fix] 扩展字段：仅用于返回给前端，不存库",
+                    "type": "number"
+                },
+                "_id": {
+                    "description": "TCB 自动 ID",
+                    "type": "string"
+                },
+                "_openid": {
+                    "description": "[Audit Fix] 系统字段：记录创建者",
+                    "type": "string"
+                },
+                "address": {
+                    "description": "地址",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "业务创建时间",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "简介",
+                    "type": "string"
+                },
+                "images": {
+                    "description": "轮播图",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "latitude": {
+                    "description": "纬度",
+                    "type": "number"
+                },
+                "longitude": {
+                    "description": "经度",
+                    "type": "number"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "open_time": {
+                    "description": "营业时间",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "电话",
+                    "type": "string"
+                },
+                "region_id": {
+                    "description": "所属区域",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "状态 1:启用 0:禁用",
+                    "type": "integer"
+                },
+                "type": {
+                    "description": "类型",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "业务更新时间",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Photo": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "TCB 自动生成的 ID",
+                    "type": "string"
+                },
+                "_openid": {
+                    "description": "系统字段：发布者 (用户ID)",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "业务创建时间",
+                    "type": "string"
+                },
+                "image_url": {
+                    "description": "照片云存储 URL",
+                    "type": "string"
+                },
+                "like_count": {
+                    "description": "点赞数 (用于热门排序)",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "审核状态: 0=待审(默认), 1=通过, 2=拒绝",
+                    "type": "integer"
+                },
+                "theme_id": {
+                    "description": "关联的主题 ID",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "业务更新时间 (审核时间)",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Region": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "TCB 自动生成的 ID (String)",
+                    "type": "string"
+                },
+                "_openid": {
+                    "description": "系统字段",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "区域名称",
+                    "type": "string"
+                },
+                "sort": {
+                    "description": "排序权重 (值越大越靠前)",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "1: 启用, 0: 禁用",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Theme": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "TCB 自动生成的 ID",
+                    "type": "string"
+                },
+                "_openid": {
+                    "description": "系统字段：创建者",
+                    "type": "string"
+                },
+                "cover": {
+                    "description": "封面图 URL",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "业务创建时间",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "主题简介",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "主题名称 (如: \"汉服打卡\")",
+                    "type": "string"
+                },
+                "region_id": {
+                    "description": "所属区域 ID (用于实现 PRD 5.1.1 区域优先推荐)",
+                    "type": "string"
+                },
+                "sort": {
+                    "description": "排序权重 (默认 100)",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "1:启用 0:禁用",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "description": "业务更新时间",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

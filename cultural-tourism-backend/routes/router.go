@@ -53,5 +53,21 @@ func RegisterRoutes(r *gin.Engine) {
 		api.GET("/photos/:id", controllers.GetPhotoDetail) // 详情
 		api.PUT("/photos/:id", controllers.UpdatePhoto)    // 审核/点赞
 		api.DELETE("/photos/:id", controllers.DeletePhoto) // 删除
+
+		// ================= Phase 5: 评论互动 (Comments) =================
+		api.POST("/comments", controllers.CreateComment)       // 发布评论
+		api.GET("/comments", controllers.GetCommentList)       // 列表
+		api.GET("/comments/:id", controllers.GetCommentDetail) // 详情
+		api.PUT("/comments/:id", controllers.UpdateComment)    // 审核/点赞
+		api.DELETE("/comments/:id", controllers.DeleteComment) // 删除
+
+		// ================= Phase 5: 商品导流 (Products) =================
+		api.POST("/products", controllers.CreateProduct)       // 创建
+		api.GET("/products", controllers.GetProductList)       // 列表
+		api.GET("/products/:id", controllers.GetProductDetail) // 详情
+		api.PUT("/products/:id", controllers.UpdateProduct)    // 更新
+		api.DELETE("/products/:id", controllers.DeleteProduct) // 删除
 	}
 }
+
+

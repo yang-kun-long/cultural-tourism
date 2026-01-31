@@ -61,7 +61,7 @@
     - [x] 列表查询 (支持分页与区域/类型筛选)
     - [x] LBS 距离计算 (Haversine Algorithm)
 
-### Phase 4: UGC 旅拍社区 [进行中 🔄]
+### Phase 4: UGC 旅拍社区 [已完成 ✅]
 
 > *对应 PRD 5.1, 6.3, 7.1*
 
@@ -70,23 +70,27 @@
   - [x] **接口**:
     - [x] 主题列表: 支持按 **“区域优先”** (region_id) 筛选
     - [x] 主题详情: 展示封面、简介
-- [ ] **照片管理 (Photos)** `[Audit: Pending]`
-  - [ ] **模型**: ThemeID, UserID, URL, Status(待审/通过/下架)
-  - [ ] **接口**:
-    - [ ] 照片上传 (仅手机相册)
-    - [ ] 瀑布流列表 (关联 Theme)
-    - [ ] 审核状态流转 (UGC 核心: 待审->通过/拒绝)
+- [x] **照片管理 (Photos)** `[Audit: Passed]`
+  - [x] **模型**: ThemeID, ImageURL, Status(待审/通过/拒绝), LikeCount, _openid, CreatedAt/UpdatedAt
+  - [x] **接口**:
+    - [x] 照片上传 (默认待审 status=0)
+    - [x] 瀑布流列表 (支持 theme_id 筛选，默认 status=1)
+    - [x] 详情 / 删除 / 审核状态流转 / 点赞更新
+
 
 ### Phase 5: 互动与导流
 
 > *对应 PRD 5.4, 5.5, 6.1, 7.1*
 
-- [ ] **评论互动 (Comments)** `[Audit: Pending]`
-  - [ ] **模型**: POI_ID, Content, UserID, Status, ParentID(盖楼)
-  - [ ] **接口**: 发布评论(默认待审)
-- [ ] **商品导流 (Products)** `[Audit: Pending]`
-  - [ ] **模型**: Name, Image, Price, JumpAppID, JumpPath
-  - [ ] **接口**: 列表(区域优先), 详情(无支付直接跳转)
+- [x] **评论互动 (Comments)** `[Audit: Passed]`
+  - [x] **模型**: POIID, ParentID, Content, Status, LikeCount, _openid, CreatedAt/UpdatedAt
+  - [x] **接口**: 发布评论(默认待审) / 列表 / 详情 / 删除 / 审核 / 点赞
+
+
+- [x] **商品导流 (Products)** `[Audit: Passed]`
+  - [x] **模型**: Name, Image, Price, JumpAppID, JumpPath, _openid, CreatedAt/UpdatedAt
+  - [x] **接口**: 列表 / 详情 / 新增 / 更新 / 删除 (无支付仅跳转)
+
 
 ### Phase 6: 用户资产与旅拍机
 
@@ -152,26 +156,94 @@
 
 ```
 
+### `photos` (Collection Name: `photo`) (已上线)
+
+```json
+{
+  "theme_id": "string (ref: themes._id)",
+  "image_url": "string",
+  "status": "number (0:待审, 1:通过, 2:拒绝)",
+  "like_count": "number",
+  "_openid": "string (system)",
+  "created_at": "string",
+  "updated_at": "string",
+  "_id": "..."
+}
+
+```
+
+### `comments` (Collection Name: `comment`) (已上线)
+
+```json
+{
+  "poi_id": "string (ref: pois._id)",
+  "parent_id": "string",
+  "content": "string",
+  "status": "number (0:待审, 1:通过, 2:拒绝)",
+  "like_count": "number",
+  "_openid": "string (system)",
+  "created_at": "string",
+  "updated_at": "string",
+  "_id": "..."
+}
+
+```
+
+### `products` (Collection Name: `product`) (已上线)
+
+```json
+{
+  "name": "string",
+  "image": "string",
+  "price": "number",
+  "jump_app_id": "string",
+  "jump_path": "string",
+  "_openid": "string (system)",
+  "created_at": "string",
+  "updated_at": "string",
+  "_id": "..."
+}
+
+```
+
 ## 6. 当前项目目录结构
+
+
+
 
 ```text
 /
 ├── config
 │   └── config.go
 ├── controllers
+│   ├── comment_controller.go
+│   ├── photo_controller.go
 │   ├── poi_controller.go
+│   ├── product_controller.go
 │   ├── region_controller.go
-│   └── theme_controller.go  # [新增]
+│   └── theme_controller.go
 ├── database
 │   └── db.go
 ├── model-json
-│   ├── regions_model.json
+│   ├── comments_model.json
+│   ├── photos_model.json
 │   ├── pois_model.json
-│   └── themes_model.json    # [新增]
+│   ├── products_model.json
+│   ├── regions_model.json
+│   └── themes_model.json
 ├── models
+│   ├── comment.go
+│   ├── photo.go
 │   ├── poi.go
+│   ├── product.go
 │   ├── region.go
-│   └── theme.go             # [新增]
+│   └── theme.go
+├── services                   # [新增]
+│   ├── comment_service.go     # [新增]
+│   └── photo_service.go       # [新增]
+
+
+
 ├── routes
 │   └── router.go
 ├── tcb

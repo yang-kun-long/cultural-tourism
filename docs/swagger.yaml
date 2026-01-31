@@ -1,0 +1,753 @@
+basePath: /api
+definitions:
+  models.Comment:
+    properties:
+      _id:
+        description: TCB 自动 ID
+        type: string
+      _openid:
+        description: 发布者 (系统字段)
+        type: string
+      content:
+        description: 评论内容
+        type: string
+      created_at:
+        description: 业务创建时间
+        type: string
+      like_count:
+        description: 点赞数
+        type: integer
+      parent_id:
+        description: 父评论 ID (空字符串表示一级评论)
+        type: string
+      poi_id:
+        description: 关联的点位 ID
+        type: string
+      status:
+        description: 0:待审, 1:通过, 2:拒绝
+        type: integer
+      updated_at:
+        description: 业务更新时间
+        type: string
+    type: object
+  models.POI:
+    properties:
+      _distance:
+        description: '[Audit Fix] 扩展字段：仅用于返回给前端，不存库'
+        type: number
+      _id:
+        description: TCB 自动 ID
+        type: string
+      _openid:
+        description: '[Audit Fix] 系统字段：记录创建者'
+        type: string
+      address:
+        description: 地址
+        type: string
+      created_at:
+        description: 业务创建时间
+        type: string
+      desc:
+        description: 简介
+        type: string
+      images:
+        description: 轮播图
+        items:
+          type: string
+        type: array
+      latitude:
+        description: 纬度
+        type: number
+      longitude:
+        description: 经度
+        type: number
+      name:
+        description: 名称
+        type: string
+      open_time:
+        description: 营业时间
+        type: string
+      phone:
+        description: 电话
+        type: string
+      region_id:
+        description: 所属区域
+        type: string
+      status:
+        description: 状态 1:启用 0:禁用
+        type: integer
+      type:
+        description: 类型
+        type: string
+      updated_at:
+        description: 业务更新时间
+        type: string
+    type: object
+  models.Photo:
+    properties:
+      _id:
+        description: TCB 自动生成的 ID
+        type: string
+      _openid:
+        description: 系统字段：发布者 (用户ID)
+        type: string
+      created_at:
+        description: 业务创建时间
+        type: string
+      image_url:
+        description: 照片云存储 URL
+        type: string
+      like_count:
+        description: 点赞数 (用于热门排序)
+        type: integer
+      status:
+        description: '审核状态: 0=待审(默认), 1=通过, 2=拒绝'
+        type: integer
+      theme_id:
+        description: 关联的主题 ID
+        type: string
+      updated_at:
+        description: 业务更新时间 (审核时间)
+        type: string
+    type: object
+  models.Region:
+    properties:
+      _id:
+        description: TCB 自动生成的 ID (String)
+        type: string
+      _openid:
+        description: 系统字段
+        type: string
+      created_at:
+        description: 创建时间
+        type: string
+      name:
+        description: 区域名称
+        type: string
+      sort:
+        description: 排序权重 (值越大越靠前)
+        type: integer
+      status:
+        description: '1: 启用, 0: 禁用'
+        type: integer
+      updated_at:
+        description: 更新时间
+        type: string
+    type: object
+  models.Theme:
+    properties:
+      _id:
+        description: TCB 自动生成的 ID
+        type: string
+      _openid:
+        description: 系统字段：创建者
+        type: string
+      cover:
+        description: 封面图 URL
+        type: string
+      created_at:
+        description: 业务创建时间
+        type: string
+      desc:
+        description: 主题简介
+        type: string
+      name:
+        description: '主题名称 (如: "汉服打卡")'
+        type: string
+      region_id:
+        description: 所属区域 ID (用于实现 PRD 5.1.1 区域优先推荐)
+        type: string
+      sort:
+        description: 排序权重 (默认 100)
+        type: integer
+      status:
+        description: 1:启用 0:禁用
+        type: integer
+      updated_at:
+        description: 业务更新时间
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: 基于 Go + Gin + 腾讯云开发构建的 RESTful API
+  title: 数字文旅后端 API
+  version: "1.0"
+paths:
+  /comments:
+    get:
+      description: 默认只显示审核通过(status=1)的评论
+      parameters:
+      - description: 点位ID
+        in: query
+        name: poi_id
+        type: string
+      - description: 状态 (1:通过, 0:待审)
+        in: query
+        name: status
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: size
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取评论列表
+      tags:
+      - Comments
+    post:
+      consumes:
+      - application/json
+      description: 用户发布评论 (默认待审核 status=0)
+      parameters:
+      - description: 评论信息
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Comment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 发布评论
+      tags:
+      - Comments
+  /comments/{id}:
+    delete:
+      description: 管理员可删除违规评论，用户可删除自己的评论(依赖TCB权限)
+      parameters:
+      - description: 评论ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 删除评论
+      tags:
+      - Comments
+    get:
+      parameters:
+      - description: 评论ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取评论详情
+      tags:
+      - Comments
+    put:
+      consumes:
+      - application/json
+      description: 用于管理员审核 (修改status) 或 用户点赞 (修改like_count)
+      parameters:
+      - description: 评论ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新内容 (仅status/like_count)
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Comment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 更新评论 (审核/点赞)
+      tags:
+      - Comments
+  /photos:
+    get:
+      description: 支持按主题ID筛选，默认只显示审核通过(status=1)的照片
+      parameters:
+      - description: 主题ID
+        in: query
+        name: theme_id
+        type: string
+      - description: 状态 (1:通过, 0:待审)
+        in: query
+        name: status
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: size
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取照片列表
+      tags:
+      - Photos
+    post:
+      consumes:
+      - application/json
+      description: 用户上传旅拍照片 (上传后默认为待审核状态 status=0)
+      parameters:
+      - description: 照片信息
+        in: body
+        name: photo
+        required: true
+        schema:
+          $ref: '#/definitions/models.Photo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 上传照片
+      tags:
+      - Photos
+  /photos/{id}:
+    delete:
+      description: 管理员可删除违规照片，用户可删除自己的照片(依赖TCB权限)
+      parameters:
+      - description: 照片ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 删除照片
+      tags:
+      - Photos
+    get:
+      parameters:
+      - description: 照片ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取照片详情
+      tags:
+      - Photos
+    put:
+      consumes:
+      - application/json
+      description: 用于管理员审核 (修改status) 或 用户点赞 (修改like_count)
+      parameters:
+      - description: 照片ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新内容 (仅status/like_count)
+        in: body
+        name: photo
+        required: true
+        schema:
+          $ref: '#/definitions/models.Photo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 更新照片 (审核/点赞)
+      tags:
+      - Photos
+  /pois:
+    get:
+      description: 查询点位列表，支持按区域、类型筛选。若传入 lat/lng，结果将包含距离信息(_distance)。
+      parameters:
+      - description: 区域ID
+        in: query
+        name: region_id
+        type: string
+      - description: 点位类型 (scenic/food/hotel/booth)
+        in: query
+        name: type
+        type: string
+      - description: 用户纬度 (用于计算距离)
+        format: float64
+        in: query
+        name: lat
+        type: number
+      - description: 用户经度 (用于计算距离)
+        format: float64
+        in: query
+        name: lng
+        type: number
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: size
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取点位列表 (支持LBS)
+      tags:
+      - POI
+    post:
+      consumes:
+      - application/json
+      description: 创建新的 POI 点位 (景点/饭店/酒店/旅拍机)
+      parameters:
+      - description: POI信息
+        in: body
+        name: poi
+        required: true
+        schema:
+          $ref: '#/definitions/models.POI'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 创建点位
+      tags:
+      - POI
+  /pois/{id}:
+    delete:
+      parameters:
+      - description: POI ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 删除点位
+      tags:
+      - POI
+    get:
+      parameters:
+      - description: POI ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.POI'
+      summary: 获取点位详情
+      tags:
+      - POI
+    put:
+      consumes:
+      - application/json
+      description: 更新点位信息 (安全更新，忽略系统字段)
+      parameters:
+      - description: POI ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新信息
+        in: body
+        name: poi
+        required: true
+        schema:
+          $ref: '#/definitions/models.POI'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 更新点位
+      tags:
+      - POI
+  /regions:
+    get:
+      consumes:
+      - application/json
+      description: 查询区域列表，支持分页
+      parameters:
+      - description: 页码 (默认1)
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量 (默认100)
+        in: query
+        name: size
+        type: integer
+      - description: 状态 (1:启用, 0:禁用)
+        in: query
+        name: status
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取所有区域
+      tags:
+      - Regions
+    post:
+      consumes:
+      - application/json
+      description: 创建一个新的景区区域 (Name必填)
+      parameters:
+      - description: 区域信息
+        in: body
+        name: region
+        required: true
+        schema:
+          $ref: '#/definitions/models.Region'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 创建区域
+      tags:
+      - Regions
+  /regions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除指定区域
+      parameters:
+      - description: 区域ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 删除区域
+      tags:
+      - Regions
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取单个区域的详细信息
+      parameters:
+      - description: 区域ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取区域详情
+      tags:
+      - Regions
+    put:
+      consumes:
+      - application/json
+      description: 根据 ID 更新区域信息 (支持 name, sort, status)
+      parameters:
+      - description: 区域ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新内容 (仅需传修改字段)
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.Region'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 更新区域
+      tags:
+      - Regions
+  /themes:
+    get:
+      description: 支持按区域筛选。实现PRD“区域优先推荐”：前端应先传region_id查询，若为空则不传region_id查全局。
+      parameters:
+      - description: 区域ID
+        in: query
+        name: region_id
+        type: string
+      - description: 状态 (1:启用)
+        in: query
+        name: status
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: size
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取主题列表
+      tags:
+      - Themes
+    post:
+      consumes:
+      - application/json
+      description: 创建新的旅拍活动主题 (仅管理员)
+      parameters:
+      - description: 主题信息
+        in: body
+        name: theme
+        required: true
+        schema:
+          $ref: '#/definitions/models.Theme'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 创建旅拍主题
+      tags:
+      - Themes
+  /themes/{id}:
+    delete:
+      parameters:
+      - description: 主题ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 删除主题
+      tags:
+      - Themes
+    get:
+      parameters:
+      - description: 主题ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取主题详情
+      tags:
+      - Themes
+    put:
+      consumes:
+      - application/json
+      description: 更新主题信息 (支持增量更新)
+      parameters:
+      - description: 主题ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新内容
+        in: body
+        name: theme
+        required: true
+        schema:
+          $ref: '#/definitions/models.Theme'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 更新主题
+      tags:
+      - Themes
+swagger: "2.0"

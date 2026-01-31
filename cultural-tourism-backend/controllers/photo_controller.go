@@ -3,16 +3,13 @@ package controllers
 
 import (
 	"net/http"
-	"time"
 
 	"cultural-tourism-backend/models"
-	"cultural-tourism-backend/tcb"
+	"cultural-tourism-backend/services"
 
 	"github.com/gin-gonic/gin"
 )
 
-// [Critical] 数据库实际集合名为单数 "photo"
-const CollectionPhoto = "photo"
 
 // CreatePhoto 上传照片
 // @Summary      上传照片
@@ -30,16 +27,7 @@ func CreatePhoto(c *gin.Context) {
 		return
 	}
 
-	// [Security] 强制初始化字段，防止恶意篡改
-	photo.ID = ""
-	photo.Status = 0    // 必须待审
-	photo.LikeCount = 0 // 初始点赞为0
-	photo.CreatedAt = time.Now().Format(time.RFC3339)
-	photo.UpdatedAt = time.Now().Format(time.RFC3339)
-
-	// OpenID 由 TCB 系统在写入时自动记录，无需 Go 层处理
-
-	result, err := tcb.Client.CreateData(CollectionPhoto, photo)
+	result, err := services.CreatePhoto(&photo)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "上传失败: " + err.Error()})
 		return
@@ -65,24 +53,7 @@ func GetPhotoList(c *gin.Context) {
 		return
 	}
 
-	// 1. 构造筛选条件
-	where := make(map[string]interface{})
-
-	// 状态筛选
-	where["status"] = map[string]interface{}{"$eq": query.Status}
-
-	// 主题筛选 (瀑布流核心)
-	if query.ThemeID != "" {
-		where["theme_id"] = map[string]interface{}{"$eq": query.ThemeID}
-	}
-
-	filter := map[string]interface{}{
-		"where": where,
-		// TODO: 待 SDK 升级后支持 "orderBy": [{"field": "created_at", "direction": "desc"}]
-	}
-
-	// 2. 调用 SDK
-	result, err := tcb.Client.ListData(CollectionPhoto, filter, query.Page, query.Size)
+	result, err := services.ListPhotos(query)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "查询失败: " + err.Error()})
 		return
@@ -104,7 +75,7 @@ func GetPhotoDetail(c *gin.Context) {
 		return
 	}
 
-	result, err := tcb.Client.GetDetail(CollectionPhoto, id)
+	result, err := services.GetPhotoDetail(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "照片不存在"})
 		return
@@ -131,24 +102,7 @@ func UpdatePhoto(c *gin.Context) {
 		return
 	}
 
-	// [Security] Partial Update - 仅允许更新特定字段
-	updateData := map[string]interface{}{
-		"updated_at": time.Now().Format(time.RFC3339),
-	}
-
-	// 场景 A: 审核 (0 -> 1/2)
-	// 注意: status 可能为 0, 需要区分是没传还是传了0。此处假设用于审核/下架，值通常非0
-	// 实际业务中，可能需要更细致的鉴权
-	if photo.Status != 0 {
-		updateData["status"] = photo.Status
-	}
-
-	// 场景 B: 点赞 (简单计数，高并发需原子操作，此处为MVP实现)
-	if photo.LikeCount > 0 {
-		updateData["like_count"] = photo.LikeCount
-	}
-
-	err := tcb.Client.UpdateData(CollectionPhoto, id, updateData)
+	err := services.UpdatePhoto(id, photo)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新失败: " + err.Error()})
 		return
@@ -166,7 +120,7 @@ func UpdatePhoto(c *gin.Context) {
 // @Router       /photos/{id} [delete]
 func DeletePhoto(c *gin.Context) {
 	id := c.Param("id")
-	err := tcb.Client.DeleteData(CollectionPhoto, id)
+	err := services.DeletePhoto(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "删除失败"})
 		return

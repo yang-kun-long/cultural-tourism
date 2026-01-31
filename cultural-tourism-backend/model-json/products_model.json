@@ -1,0 +1,129 @@
+{
+    "previewTableName": "",
+    "publishCacheStatus": "notready",
+    "subType": "database",
+    "schema": {
+        "x-primary-column": "_id",
+        "x-kind": "tcb",
+        "type": "object",
+        "required": [
+            "name",
+            "image",
+            "price",
+            "jump_app_id",
+            "jump_path"
+        ],
+        "properties": {
+            "name": {
+                "type": "string",
+                "title": "商品名称",
+                "x-index": 0,
+                "x-filter": true
+            },
+            "image": {
+                "type": "string",
+                "title": "商品图片",
+                "description": "图片URL",
+                "x-index": 1
+            },
+            "price": {
+                "type": "number",
+                "title": "价格",
+                "description": "仅展示，无支付",
+                "x-index": 2,
+                "x-sort": true
+            },
+            "jump_app_id": {
+                "type": "string",
+                "title": "跳转小程序AppID",
+                "x-index": 3
+            },
+            "jump_path": {
+                "type": "string",
+                "title": "跳转路径",
+                "x-index": 4
+            },
+            "created_at": {
+                "type": "string",
+                "title": "业务创建时间",
+                "format": "date-time",
+                "x-index": 5
+            },
+            "updated_at": {
+                "type": "string",
+                "title": "业务更新时间",
+                "format": "date-time",
+                "x-index": 6
+            },
+            "_openid": {
+                "type": "string",
+                "title": "用户标识",
+                "description": "系统字段: 用户唯一标识",
+                "x-system": true,
+                "x-index": 7
+            },
+            "owner": {
+                "default": "",
+                "x-system": true,
+                "x-id": "34023b4",
+                "name": "owner",
+                "x-hidden": true,
+                "type": "string",
+                "title": "所有人",
+                "x-index": 8
+            },
+            "_mainDep": {
+                "x-system": true,
+                "x-id": "03475ac",
+                "name": "_mainDep",
+                "x-hidden": true,
+                "type": "string",
+                "title": "所属主管部门",
+                "x-index": 9
+            },
+            "createdAt": {
+                "default": 0,
+                "x-system": true,
+                "x-id": "0c0f2d1",
+                "format": "datetime",
+                "type": "number",
+                "title": "系统创建时间",
+                "x-index": 10
+            },
+            "createBy": {
+                "default": "",
+                "x-system": true,
+                "x-id": "6e2d7c1",
+                "name": "createBy",
+                "x-hidden": true,
+                "type": "string",
+                "title": "创建人",
+                "x-index": 11
+            },
+            "updateBy": {
+                "default": "",
+                "x-system": true,
+                "x-id": "a7f83c2",
+                "name": "updateBy",
+                "x-hidden": true,
+                "type": "string",
+                "title": "修改人",
+                "x-index": 12
+            },
+            "updatedAt": {
+                "default": 0,
+                "x-system": true,
+                "x-id": "480f94f",
+                "format": "datetime",
+                "type": "number",
+                "title": "系统更新时间",
+                "x-index": 13
+            }
+        }
+    },
+    "dbInstanceType": "FLEXDB",
+    "title": "product",
+    "name": "product",
+    "tableNameRule": "only_name",
+    "type": "database"
+}
