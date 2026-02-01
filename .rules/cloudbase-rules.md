@@ -1,6 +1,8 @@
 ---
 description: CloudBase AI Development Rules Guide - Provides scenario-based best practices to ensure development quality
-alwaysApply: false
+globs: *
+alwaysApply: true
+inclusion: always
 ---
 
 # CloudBase AI Development Rules Guide
