@@ -1,0 +1,6 @@
+{
+  "envId": "cultural-tourism-7fb138kf77a2cb2",
+  "cloudrun": {
+    "name": "cultural-tourism-backend"
+  }
+}

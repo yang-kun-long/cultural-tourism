@@ -10,6 +10,18 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine) {
+	// CORS 配置
+	r.Use(func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	})
+
 	api := r.Group("/api")
 	{
 		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -67,6 +79,12 @@ func RegisterRoutes(r *gin.Engine) {
 		api.GET("/products/:id", controllers.GetProductDetail) // 详情
 		api.PUT("/products/:id", controllers.UpdateProduct)    // 更新
 		api.DELETE("/products/:id", controllers.DeleteProduct) // 删除
+
+		// ================= Phase 6: 收藏体系 (Favorites) =================
+		api.POST("/favorites", controllers.CreateFavorite)                                    // 收藏资源
+		api.DELETE("/favorites/:resource_type/:resource_id", controllers.DeleteFavorite)      // 取消收藏 (RESTful)
+		api.GET("/favorites", controllers.ListFavorites)                                      // 收藏列表
+		api.GET("/favorites/:resource_type/:resource_id", controllers.CheckFavoriteStatus)    // 检查收藏状态
 	}
 }
 

@@ -13,8 +13,8 @@ import (
 // @title           数字文旅后端 API
 // @version         1.0
 // @description     基于 Go + Gin + 腾讯云开发构建的 RESTful API
-// @host            localhost:8080
 // @BasePath        /api
+// @schemes         https http
 func main() {
 	// 1. 初始化云开发 HTTP 客户端
 	tcb.Init()

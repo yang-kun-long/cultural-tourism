@@ -28,18 +28,30 @@ func Init() {
 
 	envID := os.Getenv("CLOUDBASE_ENV_ID")
 	accessToken := os.Getenv("CLOUDBASE_ACCESS_TOKEN")
+	useInternalAPI := os.Getenv("USE_INTERNAL_API") // 是否使用内网 API
 
 	if envID == "" {
 		fmt.Println("⚠️ 警告: 未找到 CLOUDBASE_ENV_ID 环境变量")
 	}
 
+	// 根据环境变量选择内网或外网 API
+	var baseURL string
+	if useInternalAPI == "true" {
+		// 云托管内网访问数据模型 API (内网与外网使用相同域名)
+		baseURL = fmt.Sprintf("https://%s.api.tcloudbasegateway.com", envID)
+		fmt.Println("✅ 云开发 HTTP 客户端已初始化 (内网模式 - 数据模型 API)")
+	} else {
+		// 外网访问数据模型 API (本地开发用)
+		baseURL = fmt.Sprintf("https://%s.api.tcloudbasegateway.com", envID)
+		fmt.Println("✅ 云开发 HTTP 客户端已初始化 (外网模式 - 数据模型 API)")
+	}
+
 	Client = &CloudBaseClient{
 		EnvID:       envID,
 		AccessToken: accessToken,
-		BaseURL:     fmt.Sprintf("https://%s.api.tcloudbasegateway.com", envID),
+		BaseURL:     baseURL,
 		HTTPClient:  &http.Client{},
 	}
-	fmt.Println("✅ 云开发 HTTP 客户端已初始化 (通用模式)")
 }
 
 // Request 通用 HTTP 请求处理

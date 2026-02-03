@@ -30,6 +30,21 @@ definitions:
         description: 业务更新时间
         type: string
     type: object
+  models.FavoriteCreateRequest:
+    properties:
+      resource_id:
+        type: string
+      resource_type:
+        description: 枚举验证
+        enum:
+        - theme
+        - poi
+        - product
+        type: string
+    required:
+    - resource_id
+    - resource_type
+    type: object
   models.POI:
     properties:
       _distance:
@@ -197,13 +212,83 @@ definitions:
         description: 业务更新时间
         type: string
     type: object
-host: localhost:8080
 info:
   contact: {}
   description: 基于 Go + Gin + 腾讯云开发构建的 RESTful API
   title: 数字文旅后端 API
   version: "1.0"
 paths:
+  /api/favorites:
+    get:
+      description: 分页获取当前用户的收藏列表 (支持按资源类型筛选)
+      parameters:
+      - description: 资源类型筛选 (theme/poi/product)
+        in: query
+        name: resource_type
+        type: string
+      - default: 1
+        description: 页码 (默认1)
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 每页数量 (默认20, 最大100)
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 收藏列表
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 参数错误
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 服务器错误
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取用户收藏列表
+      tags:
+      - Favorites
+    post:
+      consumes:
+      - application/json
+      description: 用户收藏旅拍主题/景点POI/商品 (幂等：重复收藏返回错误)
+      parameters:
+      - description: 收藏请求
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.FavoriteCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 收藏成功
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 参数错误或已收藏
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 服务器错误
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 收藏资源
+      tags:
+      - Favorites
   /comments:
     get:
       description: 默认只显示审核通过(status=1)的评论
@@ -316,6 +401,80 @@ paths:
       summary: 更新评论 (审核/点赞)
       tags:
       - Comments
+  /favorites/{resource_type}/{resource_id}:
+    delete:
+      description: 通过资源类型和资源ID取消收藏 (RESTful路径参数)
+      parameters:
+      - description: 资源类型 (theme/poi/product)
+        in: path
+        name: resource_type
+        required: true
+        type: string
+      - description: 资源ID
+        in: path
+        name: resource_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 取消成功
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 参数错误
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 收藏记录不存在
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 服务器错误
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 取消收藏
+      tags:
+      - Favorites
+    get:
+      description: 检查指定资源是否已被当前用户收藏 (RESTful路径参数)
+      parameters:
+      - description: 资源类型 (theme/poi/product)
+        in: path
+        name: resource_type
+        required: true
+        type: string
+      - description: 资源ID
+        in: path
+        name: resource_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '返回 {is_favorited: true/false}'
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 参数错误
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 服务器错误
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 检查是否已收藏
+      tags:
+      - Favorites
   /photos:
     get:
       description: 支持按主题ID筛选，默认只显示审核通过(status=1)的照片
@@ -883,4 +1042,7 @@ paths:
       summary: 更新主题
       tags:
       - Themes
+schemes:
+- https
+- http
 swagger: "2.0"

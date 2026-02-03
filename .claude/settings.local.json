@@ -2,7 +2,19 @@
   "permissions": {
     "allow": [
       "mcp__cloudbase__envQuery",
-      "mcp__cloudbase__downloadTemplate"
+      "mcp__cloudbase__downloadTemplate",
+      "Bash(swag init)",
+      "Bash(curl -X POST http://localhost:8080/api/favorites -H \"Content-Type: application/json\" -d \"{\"\"resource_type\"\":\"\"theme\"\",\"\"resource_id\"\":\"\"fa1010a2697cc6070048bc645ec83b50\"\"}\")",
+      "mcp__cloudbase__readNoSqlDatabaseStructure",
+      "mcp__cloudbase__readNoSqlDatabaseContent",
+      "Bash(curl -X GET \"http://localhost:8080/api/favorites/theme/fa1010a2697cc6070048bc645ec83b50\" -H \"Content-Type: application/json\")",
+      "mcp__cloudbase__login",
+      "mcp__cloudbase__queryCloudRun",
+      "mcp__cloudbase__manageCloudRun",
+      "WebSearch",
+      "mcp__cloudbase__executeReadOnlySQL",
+      "mcp__cloudbase__manageDataModel",
+      "mcp__cloudbase__searchKnowledgeBase"
     ]
   }
 }

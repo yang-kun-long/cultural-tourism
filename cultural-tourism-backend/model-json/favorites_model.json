@@ -1,0 +1,125 @@
+{
+    "previewTableName": "",
+    "publishCacheStatus": "notready",
+    "subType": "database",
+    "schema": {
+        "x-primary-column": "_id",
+        "x-kind": "tcb",
+        "type": "object",
+        "required": [
+            "resource_type",
+            "resource_id"
+        ],
+        "properties": {
+            "resource_type": {
+                "type": "string",
+                "title": "资源类型",
+                "description": "枚举: theme(旅拍主题) / poi(景点POI) / product(商品)",
+                "enum": ["theme", "poi", "product"],
+                "default": "theme",
+                "x-index": 0,
+                "x-filter": true
+            },
+            "resource_id": {
+                "type": "string",
+                "title": "资源ID",
+                "description": "被收藏资源的_id (关联对应集合)",
+                "x-index": 1,
+                "x-filter": true
+            },
+            "created_at": {
+                "type": "string",
+                "title": "业务创建时间",
+                "format": "date-time",
+                "x-index": 2,
+                "x-sort": true
+            },
+            "updated_at": {
+                "type": "string",
+                "title": "业务更新时间",
+                "format": "date-time",
+                "x-index": 3
+            },
+            "owner": {
+                "default": "",
+                "x-system": true,
+                "x-id": "owner001",
+                "name": "owner",
+                "x-hidden": true,
+                "type": "string",
+                "title": "所有人",
+                "x-index": 4
+            },
+            "_mainDep": {
+                "x-system": true,
+                "x-id": "maindep001",
+                "name": "_mainDep",
+                "x-hidden": true,
+                "type": "string",
+                "title": "所属主管部门",
+                "x-index": 5
+            },
+            "createdAt": {
+                "default": 0,
+                "x-system": true,
+                "x-id": "createdat001",
+                "format": "datetime",
+                "type": "number",
+                "title": "系统创建时间",
+                "x-index": 6
+            },
+            "createBy": {
+                "default": "",
+                "x-system": true,
+                "x-id": "createby001",
+                "name": "createBy",
+                "x-hidden": true,
+                "type": "string",
+                "title": "创建人",
+                "x-index": 7
+            },
+            "updateBy": {
+                "default": "",
+                "x-system": true,
+                "x-id": "updateby001",
+                "name": "updateBy",
+                "x-hidden": true,
+                "type": "string",
+                "title": "修改人",
+                "x-index": 8
+            },
+            "_openid": {
+                "default": "",
+                "x-system": true,
+                "x-id": "openid001",
+                "name": "_openid",
+                "type": "string",
+                "title": "记录创建者",
+                "description": "用户唯一标识 (微信云开发)",
+                "x-index": 9
+            },
+            "_id": {
+                "x-system": true,
+                "x-id": "id001",
+                "type": "string",
+                "title": "数据标识",
+                "x-index": 10,
+                "x-unique": true
+            },
+            "updatedAt": {
+                "default": 0,
+                "x-system": true,
+                "x-id": "updatedat001",
+                "format": "datetime",
+                "type": "number",
+                "title": "系统更新时间",
+                "x-index": 11
+            }
+        }
+    },
+    "dbInstanceType": "FLEXDB",
+    "title": "用户收藏",
+    "name": "favorites",
+    "tableNameRule": "only_name",
+    "type": "database"
+}
